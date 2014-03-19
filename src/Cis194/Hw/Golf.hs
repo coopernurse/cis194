@@ -1,4 +1,4 @@
-module Golf where
+module Cis194.Hw.Golf where
 
 skips :: [a] -> [[a]]
 skips _ = []
