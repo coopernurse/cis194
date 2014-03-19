@@ -14,10 +14,10 @@ doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther xs = xs
 
 sumDigits :: [Integer] -> Integer
-sumDigits xs = 0
+sumDigits _ = 0
 
 validate :: Integer -> Bool
-validate x = False
+validate _ = False
 
 ---------------------
 -- Towers of Hanoi --
@@ -27,4 +27,4 @@ type Peg = String
 type Move = (Peg, Peg)
 
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
-hanoi x p1 p2 p3 = []
+hanoi _ _ _ _ = []
