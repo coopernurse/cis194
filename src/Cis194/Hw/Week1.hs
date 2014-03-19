@@ -6,13 +6,12 @@ module Cis194.Hw.Week1 where
 
 toDigits :: Integer -> [Integer]
 toDigits x
-  | x < 1 = []
+  | x < 1  = []
+  | x < 10 = [x]
   | otherwise = toDigits(x `div` 10) ++ [(x `mod` 10)]
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev x
-  | x < 1 = []
-  | otherwise = (x `mod` 10) : toDigitsRev(x `div` 10)
+toDigitsRev x = reverse(toDigits(x))
 
 doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther [] = []
