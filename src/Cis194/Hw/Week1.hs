@@ -26,6 +26,12 @@ doubleIfListLenOdd :: Integer -> [Integer] -> [Integer]
 doubleIfListLenOdd x xs | even $ length xs = x : xs
 doubleIfListLenOdd x xs = (x*2) : xs
 
+doubleEveryOther' :: [Integer] -> [Integer]
+doubleEveryOther' [] = []
+doubleEveryOther' (x:xs) = x' : doubleEveryOther' xs
+  where x' = if even $ length xs then x
+             else x * 2
+
 sumDigits :: [Integer] -> Integer
 sumDigits xs = foldr (\x acc -> acc + (sum $ toDigits x)) 0 xs
 
