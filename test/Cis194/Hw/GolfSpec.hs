@@ -14,11 +14,11 @@ spec = do
       skips "hello!" `shouldBe` ["hello!", "el!", "l!", "l", "o", "!"]
 
     it "should handle single element lists" $ do
-      skips [1] `shouldBe` [[1]]
+      skips [1 :: Integer] `shouldBe` [[1]]
 
     it "should handle lists of booleans" $ do
       skips [True,False] `shouldBe` [[True,False], [False]]
 
-    -- TODO: couldn't figure out a good way to get this to compile
-    --it "should handle an empty list" $ do
-    --  skips [] == [] 
+    it "should handle an empty list" $ do
+      -- not sure if we can avoid a type annotation here
+      skips ([] :: [Integer]) `shouldBe` [] 
