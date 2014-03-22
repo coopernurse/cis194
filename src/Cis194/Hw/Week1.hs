@@ -34,7 +34,8 @@ type Peg = String
 type Move = (Peg, Peg)
 
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
-hanoi _ _ _ _ = []
+hanoi 0 _ _ _ = []
+hanoi x source dest spare = hanoi (x-1) source spare dest ++ [(source, dest)] ++ hanoi (x-1) spare dest source
 
 hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
 hanoi4 _ _ _ _ _ = []
