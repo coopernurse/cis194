@@ -15,7 +15,7 @@ toDigitsRev x = reverse(toDigits(x))
 
 doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther [] = []
-doubleEveryOther x  = reverse (map (\(digit, offset) -> if (offset `mod` 2) == 1 then digit * 2 else digit) (zip (reverse x) [0..]))
+doubleEveryOther x  = (reverse . zipWith (*) (cycle [1, 2]) . reverse) x
 
 sumDigits :: [Integer] -> Integer
 sumDigits [] = 0
