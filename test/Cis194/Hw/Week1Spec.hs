@@ -57,5 +57,14 @@ spec = do
       validate 4012888888881882 `shouldBe` False
 
   describe "hanoi" $ do
-    it "should return the moves needed" $ do
-      hanoi 2 "a" "b" "c" == [("a","c"), ("a","b"), ("c","b")]
+    it "should return an empty list for zero discs" $ do
+      hanoi 0 "a" "b" "c" `shouldBe` []
+
+    it "should solve for 1 peg" $ do
+      hanoi 1 "a" "b" "c" `shouldBe` [("a", "b")]
+
+    it "should solve for 2 pegs" $ do
+      hanoi 2 "a" "b" "c" `shouldBe` [("a", "c"), ("a", "b"), ("c", "b")]
+
+    it "should solve for 3 pegs" $ do
+      hanoi 3 "a" "b" "c" `shouldBe` [("a", "b"), ("a", "c"), ("b", "c"), ("a", "b"), ("c", "a"), ("c", "b"), ("a", "b")]
