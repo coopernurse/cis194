@@ -32,11 +32,21 @@ doubleEveryOther' (x:xs) = x' : doubleEveryOther' xs
   where x' = if even $ length xs then x
              else x * 2
 
+doubleEveryOther'' :: [Integer] -> [Integer]
+doubleEveryOther'' = reverse . zipWith (*) (cycle [1, 2]) . reverse
+
 sumDigits :: [Integer] -> Integer
 sumDigits xs = foldr (\x acc -> acc + (sum $ toDigits x)) 0 xs
 
 validate :: Integer -> Bool
 validate x = (sumDigits $ (doubleEveryOther $ toDigits x)) `mod` 10 == 0
+
+validate' :: Integer -> Bool
+validate' x = z `mod` 10 == 0
+  where z = (sumDigits . doubleEveryOther . toDigits) x
+
+validate'' :: Integer -> Bool
+validate'' = (==0) . (`mod`10) . sumDigits . doubleEveryOther . toDigits
 
 ---------------------
 -- Towers of Hanoi --
@@ -63,6 +73,7 @@ leastMoves shortest (x:xs) = if length x < length shortest then leastMoves x xs 
 -- http://stackoverflow.com/questions/3607161/towers-of-hanoi-with-k-pegs
 hanoiFrameStewart :: Integer -> [Peg] -> [Move]
 hanoiFrameStewart _ []                = []
+hanoiFrameStewart _ [_]               = []
 hanoiFrameStewart 0 _                 = []
 hanoiFrameStewart _ (p1:(p2:[]))      = [(p1,p2)]
 hanoiFrameStewart n (p1:(p2:(p3:xs))) = 
