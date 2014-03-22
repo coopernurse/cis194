@@ -28,6 +28,7 @@ Test-Suite spec
   Build-Depends:        base
                       , hspec
                       , containers
+                      , QuickCheck
 
 Source-Repository head
   Type:                 git
