@@ -1,6 +1,7 @@
 module Cis194.Hw.Week1Spec (main, spec) where
 
 import Test.Hspec
+import Test.QuickCheck
 import Cis194.Hw.Week1
 
 main :: IO ()
@@ -13,11 +14,11 @@ spec = do
       toDigits 1234 `shouldBe` [1,2,3,4]
 
     it "should return an empty list for zero" $ do
-    	toDigits 0 `shouldBe` []
+      toDigits 0 `shouldBe` []
 
-    it "should return an empty list for negative numbers" $ do
-      toDigits (-1) `shouldBe` []
-      toDigits (-93939) `shouldBe` []
+    -- uses QuickCheck - need to learn how to generate constrained inputs
+    it "should return an empty list for negative numbers" $ property $
+      \x -> (if x < 0 then (toDigits x) else []) == ([] :: [Integer])
 
   describe "toDigitsRev" $ do
     it "should return an empty list for zero" $ do
