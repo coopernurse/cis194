@@ -15,14 +15,14 @@ localMaxima _ = []
 histLineStr :: [Bool] -> String
 histLineStr xs = map (\b -> if b then '*' else ' ') xs
 
-freq :: Integer -> [Integer] -> Int
-freq x xs = length $ filter (\y -> x == y) xs
+freq :: [Integer] -> Integer -> Int
+freq xs x = length $ filter (==x) xs
 
-toHistLine :: Int -> [Int] -> [Bool]
-toHistLine n freqs = map (\f -> f >= n) freqs
+toHistLine :: [Int] -> Int -> [Bool]
+toHistLine freqs n = map (>=n) freqs
 
 histogram :: [Integer] -> String
 histogram xs = (unlines (map histLineStr hlines)) ++ "==========\n0123456789\n"
-  where fr = map (\n -> freq n xs) [0..9]
+  where fr = map (freq xs) [0..9]
         maxFreq = maximum fr
-        hlines = map (\x -> toHistLine x fr) (reverse [1..maxFreq])
+        hlines = map (toHistLine fr) $ reverse [1..maxFreq]
