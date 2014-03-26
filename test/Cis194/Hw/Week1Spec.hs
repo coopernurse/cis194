@@ -74,6 +74,7 @@ spec = do
     it "should solve for 10 discs" $ do
       (acceptHanoi3 hanoi 10) `shouldBe` Just (HanoiState3 [] [1..10] [])
 
+  {- This is an optional assigment 
   describe "hanoi4" $ do
     it "should return an empty list for zero discs" $ do
       hanoi4 0 "a" "b" "c" "d" `shouldBe` []
@@ -92,4 +93,4 @@ spec = do
 
     it "should find an optimal solution for 15 disks" $ do
       length (hanoi4 15 "a" "b" "c" "d") `shouldBe` 129
-
+  -}
