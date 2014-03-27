@@ -29,6 +29,7 @@ Test-Suite spec
                       , hspec
                       , containers
                       , QuickCheck
+                      , regex-posix
 
 Source-Repository head
   Type:                 git
