@@ -1,6 +1,7 @@
 module Cis194.Hw.Golf where
 
 import Data.Maybe
+import Data.List
 
 -- generate all the skips
 -- using map and partial function application
@@ -30,4 +31,25 @@ chunk n (x:l@(y:z:_)) = [x, y, z] : chunk n l
 chunk _ _ = []
 
 histogram :: [Integer] -> String
-histogram _ = ""
+histogram = (++"==========\n0123456789\n") . toRows . digitFreqs
+
+-- computes frequency for each digit given a list
+-- using sentinel value + recursive 'span' to
+-- compute frequency of each digit in list
+digitFreqs :: [Integer] -> [Int]
+digitFreqs l1 = digitFreqs' 0 $ sort l1
+  where digitFreqs' n l2
+          | n == 10 = []
+          | otherwise = case (span (==n) l2) of
+          (left, right) -> length left : digitFreqs' (n+1) right
+
+-- convert a list of frequencies to a String
+-- representing our rows
+-- e.g. [0,1,0,0,0,0,0,0,0,0] -> " *        \n"
+-- by recursively mapping our row to the mark function
+-- and short-circuiting when we have no non-zero freqs
+toRows :: [Int] -> String
+toRows list = case (find (>0) list) of
+  Nothing -> ""
+  Just _  -> toRows (map (+(-1)) list) ++ (map (mark) list ++ "\n")
+  where mark n = if n > 0 then '*' else ' '
