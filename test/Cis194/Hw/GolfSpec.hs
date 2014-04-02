@@ -47,4 +47,3 @@ spec = do
     it "should render asterisks representing the freq of each integer" $ do
       histogram [1, 2, 3] `shouldBe` " ***      \n==========\n0123456789\n"
       histogram [1, 2, 1] `shouldBe` " *        \n **       \n==========\n0123456789\n"
-
