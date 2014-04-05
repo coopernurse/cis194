@@ -2,7 +2,7 @@
 module Cis194.Hw.LogAnalysis where
 
 -- in ghci, you may need to specify an additional include path:
--- Prelude> :set -isrc/Cis194/Hw
+-- Prelude> :set -isrc
 import Cis194.Hw.Log
 
 -- TODO: need to understand error handling. this implementation will blow up
