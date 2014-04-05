@@ -86,20 +86,20 @@ hanoiFrameStewart n (p1:(p2:(p3:xs))) =
 -- Hanoi Validator --
 ---------------------
 
-type HanoiState = Map.Map Peg [Integer]
+type HanoiState2 = Map.Map Peg [Integer]
 
-initHanoiState :: Integer -> [Peg] -> HanoiState
+initHanoiState :: Integer -> [Peg] -> HanoiState2
 initHanoiState discs pegs = case length pegs of
   0 -> Map.empty
   1 -> Map.fromList [((head pegs), [1..discs])]
   _ -> Map.fromList $ [((head pegs), [1..discs])] ++ map (\peg -> (peg, [])) (tail pegs)
 
-hanoiStateVal :: Peg -> HanoiState -> ([Integer], Bool)
+hanoiStateVal :: Peg -> HanoiState2 -> ([Integer], Bool)
 hanoiStateVal peg state = case Map.lookup peg state of
   Nothing -> ([], False)
   Just xs -> (xs, True)
 
-hanoiApplyMove :: Move -> HanoiState -> (HanoiState, Bool)
+hanoiApplyMove :: Move -> HanoiState2 -> (HanoiState2, Bool)
 hanoiApplyMove move state 
   | (not fromOk) || (not toOk) = (state, False)    -- one of the pegs in the move doesn't exist
   | length fromPeg  == 0       = (state, False)    -- there's no disc on the from peg
@@ -113,7 +113,7 @@ hanoiApplyMove move state
         newToPeg           = fromVal : toPeg
         newState           = Map.insert to newToPeg (Map.insert from (tail fromPeg) state)
 
-hanoiApplyMoves :: [Move] -> HanoiState -> (HanoiState, Bool)
+hanoiApplyMoves :: [Move] -> HanoiState2 -> (HanoiState2, Bool)
 hanoiApplyMoves [] state = (state, True)
 hanoiApplyMoves (x:xs) state = case hanoiApplyMove x state of
   (_, False) -> (state, False)
@@ -127,5 +127,6 @@ hanoiMovesValid discs pegs moves =
     -- check if result's 2nd peg matches the initial state of the 1st peg
     (result, True) -> (hanoiStateVal (head pegs) initial) == (hanoiStateVal (pegs !! 1) result)
 
-
+hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
+hanoi4 _ _ _ _ _ = []
 
