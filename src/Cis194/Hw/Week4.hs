@@ -7,7 +7,8 @@ fun1 (x:xs)
   | otherwise = fun1 xs
 
 fun1' :: [Integer] -> Integer
-fun1' _ = 0
+fun1' [] = 1
+fun1' n = foldl (*) 1 $ map (+(-2)) $ filter (even) n
 
 fun2 :: Integer -> Integer
 fun2 1 = 0
