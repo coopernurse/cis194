@@ -29,7 +29,7 @@ xor :: [Bool] -> Bool
 xor _ = False
 
 map' :: (a -> b) -> [a] -> [b]
-map' _ _ = []
+map' f list = foldr (\x l -> f x : l) [] list
 
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram _ = []
