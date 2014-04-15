@@ -30,3 +30,5 @@ xor _ = False
 map' :: (a -> b) -> [a] -> [b]
 map' _ _ = []
 
+sieveSundaram :: Integer -> [Integer]
+sieveSundaram _ = []
