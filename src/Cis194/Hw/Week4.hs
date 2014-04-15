@@ -48,6 +48,5 @@ map' :: (a -> b) -> [a] -> [b]
 map' f list = foldr (\x l -> f x : l) [] list
 
 -- EXERCISE 4
-
 sieveSundaram :: Integer -> [Integer]
-sieveSundaram _ = []
+sieveSundaram n = [(i, j) | m <- [1..n], i <- [0..n], j <- [1..i], (i + j + 2 * i * j) > n]
