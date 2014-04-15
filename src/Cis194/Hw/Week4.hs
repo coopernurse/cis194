@@ -1,5 +1,6 @@
 module Cis194.Hw.Week4 where
 
+-- EXERCISE 1
 fun1 :: [Integer] -> Integer
 fun1 [] = 1
 fun1 (x:xs)
@@ -25,18 +26,28 @@ fun2 n
 fun2' :: Integer -> Integer
 fun2' n = sum . filter (even) . takeWhile (>1) $ iterate (\x -> if even x then x `div` 2 else 3 * x + 1) n
 
+-- EXERCISE 2
 data Tree a = Leaf
   | Node Integer (Tree a) a (Tree a)
   deriving (Show, Eq)
 
 foldTree :: [a] -> Tree a
-foldTree _ = Leaf
+foldTree [] = Leaf
+foldTree list = Leaf
 
+-- EXERCISE 3
+
+-- return True only if the list contains an odd number of
+-- True
 xor :: [Bool] -> Bool
-xor _ = False
+xor [] = False
+xor list = (==1) . (`mod`2) $ foldr (\item acc -> if item then acc + 1 else acc) 0 list
 
+-- implement map using fold
 map' :: (a -> b) -> [a] -> [b]
 map' f list = foldr (\x l -> f x : l) [] list
+
+-- EXERCISE 4
 
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram _ = []
