@@ -48,5 +48,19 @@ map' :: (a -> b) -> [a] -> [b]
 map' f list = foldr (\x l -> f x : l) [] list
 
 -- EXERCISE 4
+
+-- Start with a list of the integers from 1 to n. From
+-- this list, remove all numbers of the form i + j + 2
+-- where:
+--
+-- i, j E N, 1 <= i <= j
+-- i + j + 2 * i * j <= n
+--
+-- The remaining numbers are doubled and incremented by
+-- one, giving the list of the odd (you gotta add 2
+-- yourself) prime numbers between 1 and 2n + 2.
 sieveSundaram :: Integer -> [Integer]
-sieveSundaram n = [(i, j) | m <- [1..n], i <- [0..n], j <- [1..i], (i + j + 2 * i * j) > n]
+sieveSundaram n
+  | n < 2 = []
+  | otherwise = 2:[2*z+1 | z <- [1..n], (z `elem` rejects) == False]
+  where rejects = [i+j+2*i*j | i <- [1..n], j <- [i..n]]
