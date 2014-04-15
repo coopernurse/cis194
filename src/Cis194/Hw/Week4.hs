@@ -63,4 +63,4 @@ sieveSundaram :: Integer -> [Integer]
 sieveSundaram n
   | n < 2 = []
   | otherwise = 2:[2*z+1 | z <- [1..n], (z `elem` rejects) == False]
-  where rejects = [i+j+2*i*j | i <- [1..n], j <- [i..n]]
+  where rejects = [i+j+2*i*j | i <- [1..n], j <- [i..n], i <= j, i+j+2*i*j <= n]
