@@ -8,7 +8,7 @@ fun1 (x:xs)
 
 fun1' :: [Integer] -> Integer
 fun1' [] = 1
-fun1' n = foldl (*) 1 $ map (+(-2)) $ filter (even) n
+fun1' n = product $ map (+(-2)) $ filter (even) n
 
 fun2 :: Integer -> Integer
 fun2 1 = 0
