@@ -67,6 +67,8 @@ spec = do
       (lit 8) `shouldBe` (Mod7 1)
       (lit (-2)) `shouldBe` (Mod7 5)
 
-    it "should perform addition and multiplication modulo 7" $ do
+    it "should return the largest for add" $ do
       (add (lit 6) (lit 9)) `shouldBe` (Mod7 1)
-      (mul (lit 4) (lit 10)) `shouldBe` (Mod7 5)
+
+    it "should return the smallest for mul" $ do
+      (mul (lit 4) (lit 10)) `shouldBe` (Mod7 5)      
