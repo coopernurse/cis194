@@ -13,6 +13,7 @@ data VarExprT = VLit Integer
            | Var String
   deriving (Show, Eq)
 
+
 class Expr a where
   lit :: Integer -> a
   add :: a -> a -> a
