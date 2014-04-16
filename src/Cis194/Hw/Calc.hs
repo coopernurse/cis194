@@ -1,7 +1,9 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Cis194.Hw.Calc where 
 
 import Cis194.Hw.ExprT
 import Cis194.Hw.Parser
+import qualified Cis194.Hw.StackVM as Svm
 
 class Expr a where
   lit :: Integer -> a
@@ -37,6 +39,13 @@ instance Expr Mod7 where
   add (Mod7 e1) (Mod7 e2) = Mod7 $ (e1 + e2) `mod` 7
   mul (Mod7 e1) (Mod7 e2) = Mod7 $ (e1 * e2) `mod` 7
 
+instance Expr Svm.Program where
+  lit x = [Svm.PushI x]
+  add e1 e2 = e1 ++ e2 ++ [Svm.Add]
+  mul e1 e2 = e1 ++ e2 ++ [Svm.Mul]
+
+compile :: String -> Maybe Svm.Program
+compile s = parseExp lit add mul s
 
 eval :: ExprT -> Integer
 eval (Lit x) = x
