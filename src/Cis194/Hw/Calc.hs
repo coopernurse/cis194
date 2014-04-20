@@ -15,8 +15,9 @@ eval e1 = case e1 of
   (Add e2 e3) -> eval e2 + eval e3
   (Mul e2 e3) -> eval e2 * eval e3
 
--- pass a string that can be parsed into an expression and
--- maybe get an integer from its evaluation
+-- pass a string that can be parsed into an
+-- expression and maybe get an integer from its
+-- evaluation
 -- e.g. evalStr "1+5*2" == 12
 evalStr :: String -> Maybe Integer
 evalStr s = case (parseExp Lit Add Mul s) of
