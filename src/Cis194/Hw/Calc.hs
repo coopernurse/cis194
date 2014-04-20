@@ -1,7 +1,9 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Cis194.Hw.Calc where
 
 import Cis194.Hw.ExprT
 import Cis194.Hw.Parser
+import qualified Cis194.Hw.StackVM as StackVM
 
 -- pass an expression and get back an integer
 -- e.g. Lit 4 == 4
@@ -73,3 +75,39 @@ instance Expr Mod7 where
 
 testExp :: Expr a => Maybe a
 testExp = parseExp lit add mul "(3 * -4) + 5"
+
+-- Your task is to implement a compiler for artihmetic
+-- expressions. Simply create an instance of the Expr type
+-- for Program so that arithmetic expressions can be
+-- interpreted as compiled programs. For any arithmetic
+-- expression
+--
+-- exp :: Expr a => a
+--
+-- ... it should be the case that ...
+--
+-- stackVM exp == Right [IVal exp]
+--
+
+-- This Stack Overflow discussion explains why this
+-- instance declaration blows up if we don't use the
+-- FlexibleInstances thingy:
+--
+-- http://stackoverflow.com/questions/8633470/illegal-instance-declaration-when-declaring-instance-of-isstring
+instance Expr StackVM.Program where
+  lit x = (StackVM.PushI x) : []
+  add e1 e2 = e1 ++ e2 ++ [StackVM.Add]
+  mul e1 e2 = e1 ++ e2 ++ [StackVM.Mul]
+
+-- Finally, create a function:
+--
+-- compile :: String -> Maybe Program
+--
+-- ...which takes Strings representing arithmetic
+-- expressions and compiles them into Programs that can be
+-- run on the custom CPU.
+--
+compile :: String -> Maybe StackVM.Program
+compile s = case (parseExp lit add mul s) of
+  Nothing -> Nothing
+  (Just e) -> Just e
