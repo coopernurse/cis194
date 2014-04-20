@@ -35,6 +35,41 @@ instance Expr ExprT where
   add e1 e2 = Add e1 e2
   mul e1 e2 = Mul e1 e2
 
-{-Think carefully about what types lit, add, and mul should have. -}
-{-It may be helpful to consider the types of the ExprT constructors, -}
-{-which you can find out by typing (for example)-}
+-- Make instances of Expr for each of the following types:
+--
+-- Integer - works like the original
+instance Expr Integer where
+  lit n = n
+  add n1 n2 = n1 + n2
+  mul n1 n2 = n1 * n2
+
+-- Bool - every literal value less than or equal to 0 is
+--        interpreted as False and all positive Integers
+--        are interpreted as True. Addition is logical or
+--        and multiplication is logical and
+
+instance Expr Bool where
+  lit x = x > 0
+  add y z = y || z
+  mul y z = y && z
+
+-- MinMax - addition is taken to be the max function and
+--          multiplication is the min function
+newtype MinMax = MinMax Integer deriving (Eq, Show)
+
+instance Expr MinMax where
+  lit x = MinMax x
+  add (MinMax y) (MinMax z) = MinMax (max y z)
+  mul (MinMax y) (MinMax z) = MinMax (min y z)
+
+-- Mod7 - all values should be in the range 0..6 and all
+--        arithmetic is done modulo 7
+newtype Mod7 = Mod7 Integer deriving (Eq, Show)
+
+instance Expr Mod7 where
+  lit x = Mod7 (x `mod` 7)
+  add (Mod7 y) (Mod7 z) = Mod7 ((y + z) `mod` 7)
+  mul (Mod7 y) (Mod7 z) = Mod7 ((y * z) `mod` 7)
+
+testExp :: Expr a => Maybe a
+testExp = parseExp lit add mul "(3 * -4) + 5"
