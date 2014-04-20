@@ -112,6 +112,7 @@ compile :: String -> Maybe StackVM.Program
 compile s = case (parseExp lit add mul s) of
   Nothing -> Nothing
   (Just e) -> Just e
+<<<<<<< HEAD
 
 -- EXERCISE 6
 --
