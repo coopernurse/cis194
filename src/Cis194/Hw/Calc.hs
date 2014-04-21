@@ -4,6 +4,7 @@ module Cis194.Hw.Calc where
 import Cis194.Hw.ExprT
 import Cis194.Hw.Parser
 import qualified Cis194.Hw.StackVM as StackVM
+import qualified Data.Map as M
 
 -- pass an expression and get back an integer
 -- e.g. Lit 4 == 4
@@ -111,3 +112,69 @@ compile :: String -> Maybe StackVM.Program
 compile s = case (parseExp lit add mul s) of
   Nothing -> Nothing
   (Just e) -> Just e
+
+-- EXERCISE 6
+--
+-- Create a new type class HasVars a which contains a single
+-- method:
+--
+-- var :: String -> a
+--
+-- Thus, types which are instances of HasVars have some
+-- notion of named variables.
+--
+class HasVars a where
+  var :: String -> a
+
+-- Start out by creating a new data type VarExprT which is the same as
+-- ExprT but with an extra constructor for variables. Make VarExprT an
+-- instance of both Expr and HasVars.
+--
+data VarExprT = VLit Integer
+              | VAdd VarExprT VarExprT
+              | VMul VarExprT VarExprT
+              | VVar String
+  deriving (Show)
+
+instance HasVars VarExprT where
+  var s = VVar s
+
+instance Expr VarExprT where
+  lit n = VLit n
+  add e1 e2 = VAdd e1 e2
+  mul e1 e2 = VMul e1 e2
+
+-- Implement the following instances:
+--
+-- instance HasVars (M.Map String Integer -> Maybe Integer)
+--
+-- This instance says that variables can be interpreted as functions
+-- from a mapping of variables to Integer values to (possibly) Integer
+-- values. It should work by looking up the variable in the mapping.
+--
+instance HasVars (M.Map String Integer -> Maybe Integer) where
+  var s = M.lookup s
+
+-- ...and:
+--
+-- instance Expr (M.Map String Integer -> Maybe Integer)
+--
+-- The second instance says that these same functions can be interpreted
+-- as expressions (by passing along the mapping to subexpressions and
+-- combining results appropriately).
+
+instance Expr (M.Map String Integer -> Maybe Integer) where
+  lit n = \_ -> Just n
+  add e1 e2 = \m -> case e1 m of
+                      Nothing -> Nothing
+                      (Just x) -> case e2 m of
+                                    Nothing -> Nothing
+                                    (Just y) -> Just (x + y)
+  mul e1 e2 = \m -> case e1 m of
+                      Nothing -> Nothing
+                      (Just x) -> case e2 m of
+                                    Nothing -> Nothing
+                                    (Just y) -> Just (x * y)
+
+withVars :: [(String, Integer)] -> (M.Map String Integer -> Maybe Integer) -> Maybe Integer
+withVars vs exp = exp $ M.fromList vs
