@@ -41,7 +41,7 @@ foldTree list = Leaf
 -- True
 xor :: [Bool] -> Bool
 xor [] = False
-xor list = (==1) . (`mod`2) $ foldr (\item acc -> if item then acc + 1 else acc) 0 list
+xor list = (==1) . (`mod`2) $ foldr (\item acc -> if item then (acc :: Integer) + 1 else (acc :: Integer)) 0 list
 
 -- implement map using fold
 map' :: (a -> b) -> [a] -> [b]
