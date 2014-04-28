@@ -4,6 +4,13 @@ module Cis194.Hw.Calc where
 import Cis194.Hw.ExprT
 import Cis194.Hw.Parser
 import qualified Cis194.Hw.StackVM as Svm
+import qualified Data.Map as M
+
+data VarExprT = VLit Integer
+           | VAdd VarExprT VarExprT
+           | VMul VarExprT VarExprT
+           | Var String
+  deriving (Show, Eq)
 
 import qualified Cis194.Hw.StackVM as Svm
 import qualified Data.Map as M
