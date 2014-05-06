@@ -1,8 +1,10 @@
 {-# LANGUAGE FlexibleInstances, TypeSynonymInstances #-}
-import Data.Monoid
+module JoinList where
 
 -- in ghci, you may need to specify an additional include path:
 -- Prelude> :set -isrc/Cis194/Hw
+
+import Data.Monoid
 import Sized
 import Scrabble
 import Buffer
