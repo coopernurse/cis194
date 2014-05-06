@@ -10,6 +10,10 @@ import Cis194.Hw.Scrabble
 import Cis194.Hw.Buffer
 import Data.Monoid
 
+-- in ghci, you may need to specify an additional include path:
+-- Prelude> :set -isrc/Cis194/Hw
+import Sized
+
 data JoinList m a = Empty
                    | Single m a
                    | Append m (JoinList m a) (JoinList m a)
@@ -46,6 +50,7 @@ jlToList Empty            = []
 jlToList (Single _ a)     = [a]
 jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
 
+-- ** Exercise 2
 -- 1. Implement the function:
 --    indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
 --    ...which finds the JoinList element at the specified index
