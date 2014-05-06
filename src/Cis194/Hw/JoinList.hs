@@ -25,7 +25,6 @@ tag (Empty) = mempty
 tag (Append m jl1 jl2) = tag jl1 `mappend` tag jl2
 
 
-
 -- ** Exercise 2
 --
 -- Helper functions:
@@ -56,10 +55,28 @@ indexJ n (Append m jl1 jl2)
   | otherwise = indexJ (n - leftSize) jl2
   where leftSize = getSize . size $ (tag jl1)
 
-
 -- 2. Implement the function:
 -- dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 -- ...which drops the first n elements from a JoinList.
 
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-dropJ _ (Empty) = Empty
+dropJ _ (Empty)    = Empty
+dropJ n jl | n < 1 = jl
+dropJ n (Single m a) = Empty
+dropJ n (Append m jl1 jl2)
+  | n < leftSize = dropJ n jl1
+  | otherwise = dropJ (n - leftSize) jl2
+  where leftSize = getSize . size $ tag jl1
+
+-- 3. Implement the function:
+-- takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+-- ...which returns the first n elements from a JoinList.
+
+takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+takeJ _ (Empty)      = Empty
+takeJ n jl | n < 1   = Empty
+takeJ n (Single m a) = Single m a
+takeJ n (Append m jl1 jl2)
+  | n > leftSize = Append m jl1 (takeJ (n - leftSize) jl2)
+  | otherwise = takeJ n jl1
+  where leftSize = getSize . size $ tag jl1
