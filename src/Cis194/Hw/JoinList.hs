@@ -1,9 +1,11 @@
+{-# LANGUAGE FlexibleInstances, TypeSynonymInstances #-}
 import Data.Monoid
 
 -- in ghci, you may need to specify an additional include path:
 -- Prelude> :set -isrc/Cis194/Hw
 import Sized
 import Scrabble
+import Buffer
 
 data JoinList m a = Empty
                    | Single m a
@@ -91,3 +93,23 @@ takeJ n (Append m jl1 jl2)
 scoreLine :: String -> JoinList Score String
 scoreLine s@(x:_) = Single (scoreString s) s
 scoreLine _       = Empty
+
+
+-- ** Exercise 4
+--
+-- Since we want to track both the size and score of a buffer, you should
+-- provide a Buffer instance for the type:
+-- JoinList (Score, Size) String
+--
+
+-- NOTE: I think we the value function can be improved... but how? new
+-- Scored type class?
+instance Buffer (JoinList (Score, Size) String) where
+  fromString s               = Single (scoreString s, Size 1) s
+  line n jl                  = indexJ n jl
+  numLines jl                = getSize . size $ tag jl
+  replaceLine n s jl         = takeJ (n-1) jl +++ fromString s +++ dropJ n jl
+  toString jl                = unwords $ jlToList jl
+  value (Empty)              = 0
+  value (Single (sc, _) _)   = getScore sc
+  value (Append (sc, _) _ _) = getScore sc
