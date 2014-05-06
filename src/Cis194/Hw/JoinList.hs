@@ -8,6 +8,7 @@ import Data.Monoid
 import Cis194.Hw.Sized
 import Cis194.Hw.Scrabble
 import Cis194.Hw.Buffer
+import Data.Monoid
 
 data JoinList m a = Empty
                    | Single m a
@@ -19,10 +20,14 @@ data JoinList m a = Empty
 -- that yields a new JoinList whose monoidal annotation is derived from
 -- those of the two arguments.
 
+<<<<<<< HEAD
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
 (+++) jl1 (Empty) = jl1
 (+++) (Empty) jl2 = jl2
 (+++) jl1 jl2 = Append (tag jl1 `mappend` tag jl2) jl1 jl2
+=======
+{-(+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a-}
+>>>>>>> week 7: implementing tag for JoinList
 
 --  You may find it helpful to implement a helper function
 --  which gets the annotation at the root of a JoinList.
@@ -30,6 +35,7 @@ tag :: Monoid m => JoinList m a -> m
 tag (Single m a) = m
 tag (Empty) = mempty
 tag (Append m jl1 jl2) = tag jl1 `mappend` tag jl2
+<<<<<<< HEAD
 
 
 -- ** Exercise 2
