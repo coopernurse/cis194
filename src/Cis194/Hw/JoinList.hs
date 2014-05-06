@@ -10,7 +10,8 @@ data JoinList m a = Empty
 -- that yields a new JoinList whose monoidal annotation is derived from
 -- those of the two arguments.
 
-{-(+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a-}
+(+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
+(+++) jl1 jl2 = Append (tag jl1 `mappend` tag jl2) jl1 jl2
 
 --  You may find it helpful to implement a helper function
 --  which gets the annotation at the root of a JoinList.
