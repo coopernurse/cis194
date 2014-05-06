@@ -3,6 +3,7 @@ import Data.Monoid
 -- in ghci, you may need to specify an additional include path:
 -- Prelude> :set -isrc/Cis194/Hw
 import Sized
+import Scrabble
 
 data JoinList m a = Empty
                    | Single m a
@@ -80,3 +81,13 @@ takeJ n (Append m jl1 jl2)
   | n > leftSize = Append m jl1 (takeJ (n - leftSize) jl2)
   | otherwise = takeJ n jl1
   where leftSize = getSize . size $ tag jl1
+
+
+-- ** Exercise 3
+--
+-- Write the following function:
+-- scoreLine :: String -> JoinList Score String
+
+scoreLine :: String -> JoinList Score String
+scoreLine s@(x:_) = Single (scoreString s) s
+scoreLine _       = Empty
