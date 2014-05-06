@@ -12,6 +12,7 @@ data VarExprT = VLit Integer
            | Var String
   deriving (Show, Eq)
 
+<<<<<<< HEAD
 import qualified Cis194.Hw.StackVM as Svm
 import qualified Data.Map as M
 
@@ -22,6 +23,8 @@ data VarExprT = VLit Integer
   deriving (Show, Eq)
 
 
+=======
+>>>>>>> 2bdd524f5fc2cc92ac1600c31a4b7f27931ad191
 class Expr a where
   lit :: Integer -> a
   add :: a -> a -> a
