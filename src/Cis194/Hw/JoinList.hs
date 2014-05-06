@@ -14,6 +14,7 @@ import Data.Monoid
 -- Prelude> :set -isrc/Cis194/Hw
 import Sized
 import Scrabble
+import Buffer
 
 data JoinList m a = Empty
                    | Single m a
@@ -116,7 +117,6 @@ takeJ n (Append m jl1 jl2)
 scoreLine :: String -> JoinList Score String
 scoreLine s@(x:_) = Single (scoreString s) s
 scoreLine _       = Empty
-<<<<<<< HEAD
 
 
 -- ** Exercise 4
@@ -143,5 +143,3 @@ instance Buffer (JoinList (Score, Size) String) where
   value (Empty)              = 0
   value (Single (sc, _) _)   = getScore sc
   value (Append (sc, _) _ _) = getScore sc
-=======
->>>>>>> week 7: Scrabble monoid

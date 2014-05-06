@@ -18,12 +18,9 @@ instance Monoid Score where
     mempty  = Score 0
     mappend = (+)
 
-<<<<<<< HEAD
 getScore :: Score -> Int
 getScore (Score i) = i
 
-=======
->>>>>>> week 7: Scrabble monoid
 score :: Char -> Score
 score c
   | c == 'a' = Score 1
