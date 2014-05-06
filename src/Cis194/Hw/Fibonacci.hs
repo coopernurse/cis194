@@ -27,17 +27,13 @@ fibs1 = map fib [0..]
 -- Ex 2 --
 ----------
 
-helper :: Integer -> [Integer] -> [Integer]
-helper 0 xs = 0 : xs
-helper 1 xs = 1 : xs
-helper _ (x:y:xs) = [x, y, (x+y)] ++ xs
-
 -- Define the infinite list:
 --
 fibs2 :: [Integer]
 --
 -- I cheated b/c I couldn't figure it out
 -- http://stackoverflow.com/questions/1105765/generating-fibonacci-numbers-in-haskell
+-- esh:   fibs2 = 0 : 1 : [a + b | (a, b) <- zip fibs2 (tail fibs2)]
 fibs2 = 0:1:zipWith (+) fibs2 (tail fibs2)
 
 --
@@ -95,8 +91,7 @@ streamMap fx sa = smap list
 -- * Write a function:
 --
 streamFromSeed :: (a -> a) -> a -> Stream a
-streamFromSeed fx a = Stream v (streamFromSeed fx v)
-  where v = fx a
+streamFromSeed fx a = Stream a $ streamFromSeed fx $ fx a
 
 --
 -- ...which generates a Stream from a “seed” of type a, which is the first
