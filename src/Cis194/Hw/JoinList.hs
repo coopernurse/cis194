@@ -10,12 +10,6 @@ import Cis194.Hw.Scrabble
 import Cis194.Hw.Buffer
 import Data.Monoid
 
--- in ghci, you may need to specify an additional include path:
--- Prelude> :set -isrc/Cis194/Hw
-import Sized
-import Scrabble
-import Buffer
-
 data JoinList m a = Empty
                    | Single m a
                    | Append m (JoinList m a) (JoinList m a)
