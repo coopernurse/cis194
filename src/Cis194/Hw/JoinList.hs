@@ -107,7 +107,7 @@ scoreLine _       = Empty
 -- NOTE: I think we the value function can be improved... but how? new
 -- Scored type class?
 instance Buffer (JoinList (Score, Size) String) where
-  fromString s               = Single (scoreString s, Size 1) s
+  fromString s               = foldl (+++) Empty $ map (\y -> Single (scoreString y, Size 1) y) $ lines s
   line n jl                  = indexJ n jl
   numLines jl                = getSize . size $ tag jl
   replaceLine n s jl         = takeJ (n-1) jl +++ fromString s +++ dropJ n jl

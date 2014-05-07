@@ -52,4 +52,5 @@ score c
   | otherwise = Score 0
 
 scoreString :: String -> Score
-scoreString s = foldl1 (<>) $ map score s
+scoreString s@(x:_) = foldl1 (<>) $ map score s
+scoreString _       = Score 0
