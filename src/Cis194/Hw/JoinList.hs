@@ -69,7 +69,7 @@ dropJ _ (Empty)    = Empty
 dropJ n jl | n < 1 = jl
 dropJ n (Single m a) = Empty
 dropJ n (Append m jl1 jl2)
-  | n < leftSize = dropJ n jl1
+  | n < leftSize = dropJ n jl1 +++ jl2
   | otherwise = dropJ (n - leftSize) jl2
   where leftSize = getSize . size $ tag jl1
 
