@@ -20,6 +20,8 @@ data JoinList m a = Empty
 -- those of the two arguments.
 
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
+(+++) jl1 (Empty) = jl1
+(+++) (Empty) jl2 = jl2
 (+++) jl1 jl2 = Append (tag jl1 `mappend` tag jl2) jl1 jl2
 
 --  You may find it helpful to implement a helper function
@@ -104,10 +106,16 @@ scoreLine _       = Empty
 -- JoinList (Score, Size) String
 --
 
+-- I stole this from Alex - makes moving around in the editor much faster
+balanceJ :: (Sized m, Monoid m) => JoinList m a -> JoinList m a
+balanceJ jl@(Append _ _ _) = (balanceJ $ takeJ split jl) +++ (balanceJ $ dropJ split jl)
+  where split = (`div` 2) . getSize . size $ tag jl
+balanceJ jl = jl
+
 -- NOTE: I think we the value function can be improved... but how? new
 -- Scored type class?
 instance Buffer (JoinList (Score, Size) String) where
-  fromString s               = foldl (+++) Empty $ map (\y -> Single (scoreString y, Size 1) y) $ lines s
+  fromString s               = balanceJ $ foldr (+++) Empty $ map (\y -> Single (scoreString y, Size 1) y) $ lines s
   line n jl                  = indexJ n jl
   numLines jl                = getSize . size $ tag jl
   replaceLine n s jl         = takeJ (n-1) jl +++ fromString s +++ dropJ n jl
