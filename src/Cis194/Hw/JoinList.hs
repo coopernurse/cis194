@@ -21,6 +21,8 @@ data JoinList m a = Empty
 -- those of the two arguments.
 
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
+(+++) jl1 (Empty) = jl1
+(+++) (Empty) jl2 = jl2
 (+++) jl1 jl2 = Append (tag jl1 `mappend` tag jl2) jl1 jl2
 
 --  You may find it helpful to implement a helper function
