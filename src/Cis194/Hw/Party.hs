@@ -45,10 +45,27 @@ instance Monoid GuestList where
 
 moreFun :: GuestList -> GuestList -> GuestList
 moreFun gl1 gl2 = max gl1 gl2
+=======
+
+glCons :: Employee -> GuestList -> GuestList
+glCons e@(Emp { empFun = f1 }) (GL x f2) = GL (e:x) (f1 + f2)
+
+-- 1.2
+
+instance Monoid GuestList where
+    mempty = GL [] 0
+    mappend (GL es1 f1) (GL es2 f2) = GL (es1 ++ es2) (f1 + f2)
+
+-- 1.3
+
+moreFun :: GuestList -> GuestList -> GuestList
+moreFun gl1@(GL _ f1) gl2@(GL _ f2) = if f1 > f2 then gl1 else gl2
+>>>>>>> week 8: Party, exercise 1
 
 -- ** Exercise 2
 --
 -- 2.1
+<<<<<<< HEAD
 --
 -- The Data.Tree module from the standard Haskell libraries defines
 -- the type of “rose trees”, where each node stores a data element
