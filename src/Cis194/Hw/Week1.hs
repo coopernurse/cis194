@@ -11,7 +11,7 @@ toDigits x
   | otherwise = toDigits(x `div` 10) ++ [(x `mod` 10)]
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev x = reverse(toDigits(x))
+toDigitsRev x = reverse . toDigits $ x
 
 doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther [] = []
