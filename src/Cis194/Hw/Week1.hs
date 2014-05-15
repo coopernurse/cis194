@@ -11,11 +11,12 @@ toDigits x
   | otherwise = toDigits(x `div` 10) ++ [(x `mod` 10)]
 
 toDigitsRev :: Integer -> [Integer]
-toDigitsRev x = reverse(toDigits(x))
+toDigitsRev x = reverse . toDigits $ x
 
 doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther [] = []
-doubleEveryOther x  = (reverse . zipWith (*) (cycle [1, 2]) . reverse) x
+doubleEveryOther x  = zipWith (*) (cycle z) x
+  where z = if length x `mod` 2 == 1 then [1, 2] else [2, 1]
 
 sumDigits :: [Integer] -> Integer
 sumDigits [] = 0
