@@ -6,6 +6,13 @@ import Data.Tree
 import Debug.Trace
 import Employee
 
+-- ** Utility function
+
+startGuestList :: String -> Integer -> GuestList
+startGuestList s i
+  | i > 0     = GL [Emp { empFun = i, empName = s}] i
+  | otherwise = GL [] 0
+
 -- ** Exercise 1
 --
 -- 1.1
