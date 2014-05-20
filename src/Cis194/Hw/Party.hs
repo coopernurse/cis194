@@ -75,7 +75,6 @@ moreFun = max
 -- notes from Week 7, or infer the proper type(s) from the remainder
 -- of this assignment.)
 
-
 -- ** Exercise 3
 --
 -- Write a function
@@ -83,14 +82,16 @@ moreFun = max
 -- nextLevel :: Employee -> [(GuestList, GuestList)]
 --                       -> (GuestList, GuestList)
 --
--- which takes two arguments. The first is the “boss” of the current
+-- which takes two arguments. The first is the "boss" of the current
 -- subtree (let’s call him Bob). The second argument is a list of the
--- results for each subtree under Bob. Each result is a pair of
--- GuestLists: the first GuestList in the pair is the best possible
--- guest list with the boss of that subtree; the second is the best
--- possible guest list without the boss of that subtree. nextLevel
--- should then compute the overall best guest list that includes Bob,
--- and the overall best guest list that doesn’t include Bob.
+-- results for each subtree under Bob - with "result" defined as a
+-- pair of GuestLists: the first GuestList in the pair is the best
+-- possible guest list with the boss of that subtree; the second is
+-- the best possible guest list without the boss of that subtree.
+--
+-- nextLevel should then compute the overall best guest list that
+-- includes Bob, and the overall best guest list that doesn’t
+-- include Bob.
 
 -- ** Exercise 4
 --
