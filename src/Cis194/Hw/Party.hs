@@ -109,7 +109,6 @@ treeFold f (Node value nodes) = f value $ map (treeFold f) $ nodes
 -- nextLevel should then compute the overall best guest list that
 -- includes Bob, and the overall best guest list that doesn’t
 -- include Bob.
-
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
 nextLevel boss pairs = (withBoss, withoutBoss) where
   withBoss    = glCons boss $ mconcat $ map (snd) pairs
