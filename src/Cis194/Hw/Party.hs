@@ -54,6 +54,13 @@ instance Monoid GuestList where
 moreFun :: GuestList -> GuestList -> GuestList
 moreFun gl1 gl2 = max gl1 gl2
 
+-- since gl1 and gl2 are of a type that is an instance of Ord
+moreFun' gl1 gl2 = case (compare gl1 gl2) of
+                     GT -> gl1
+                     otherwise -> gl2
+
+moreFun'' gl1 gl2 = max gl1 gl2
+
 -- ** Exercise 2
 --
 -- 2.1
