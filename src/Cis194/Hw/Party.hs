@@ -75,6 +75,15 @@ moreFun = max
 -- notes from Week 7, or infer the proper type(s) from the remainder
 -- of this assignment.)
 
+-- isn't this treeFold1 ??
+treeFold :: (a -> [b] -> b) -> Tree a -> b
+treeFold f (Node value subForest) = f value $ map (treeFold f) subForest
+{-treeFold f i Node { rootLabel = cargo, subForest = [] } = f i cargo-}
+{-treeFold f i Node { rootLabel = cargo, subForest = s  } = foldl (treeFold f) i s-}
+{-treeFold f Node { rootLabel = cargo, subForest = s } = f cargo-}
+{-treeFold f init Node { rootLabel = cargo, subForest = s } = foldl (treeFold f) init s-}
+{-treeFold f z@(Node { rootLabel = cargo, subForest = s }) = foldl (\acc val -> acc) (f cargo) s-}
+
 -- ** Exercise 3
 --
 -- Write a function
