@@ -70,7 +70,6 @@ moreFun gl1 gl2 = max gl1 gl2
 -- notes from Week 7, or infer the proper type(s) from the remainder
 -- of this assignment.)
 
-
 -- assume (treeFold f) means 'gimme a value (to be used as default)
 -- and a tree and i'll reduce that tree into a value of that same
 -- type.
