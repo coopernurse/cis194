@@ -54,6 +54,13 @@ moreFun gl1@(GL _ f1) gl2@(GL _ f2)
   | f1 > f2   = gl1
   | otherwise = gl2
 
+-- since gl1 and gl2 are of a type that is an instance of Ord
+moreFun' gl1 gl2 = case (compare gl1 gl2) of
+                     GT -> gl1
+                     otherwise -> gl2
+
+moreFun'' gl1 gl2 = max gl1 gl2
+
 -- ** Exercise 2
 --
 -- 2.1
