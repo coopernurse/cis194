@@ -21,7 +21,7 @@ import Data.Tree
 -- Employee and add their fun score without doing any kind of checks.
 
 glCons :: Employee -> GuestList -> GuestList
-glCons e@(Emp { empFun = x }) (GL [] _) = GL [e] x
+glCons e@(Emp { empFun = x }) (GL l f) = GL (e:l) (f+x)
 
 -- 1.2
 --
