@@ -1,6 +1,6 @@
 module Cis194.Hw.Party where
 
-import Employee
+import Cis194.Hw.Employee
 import Data.Monoid
 import Data.Tree
 

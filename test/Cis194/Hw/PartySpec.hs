@@ -2,7 +2,7 @@ module Cis194.Hw.PartySpec (main, spec) where
 
 import Test.Hspec
 import Cis194.Hw.Party
-import Employee
+import Cis194.Hw.Employee
 import Data.Monoid
 
 bob   = Emp { empFun = 10, empName = "Bobbo" }
