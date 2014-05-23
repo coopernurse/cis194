@@ -13,6 +13,8 @@ startGuestList s i
   | i > 0     = GL [Emp { empFun = i, empName = s}] i
   | otherwise = GL [] 0
 
+foo = Node {rootLabel = 'b', subForest = [Node {rootLabel = 'a', subForest = []}]}
+
 -- ** Exercise 1
 --
 -- 1.1
@@ -85,10 +87,6 @@ moreFun' gl1 gl2 = case (compare gl1 gl2) of
 -- assume (treeFold f) means 'gimme a value (to be used as default)
 -- and a tree and i'll reduce that tree into a value of that same
 -- type.
-{-treeFold :: (a -> b -> b) -> b -> Tree a -> b-}
-{-treeFold f i (Node value [])    = f value i-}
-{-treeFold f i (Node value trees) = f value $ foldr (flip $ treeFold f) i trees-}
-
 treeFold :: (a -> [b] -> b) -> Tree a -> b
 treeFold f (Node value nodes) = f value $ map (treeFold f) $ nodes
 
