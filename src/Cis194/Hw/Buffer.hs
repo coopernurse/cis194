@@ -1,4 +1,4 @@
-module Buffer where
+module Cis194.Hw.Buffer where
 
 -- Type class for data structures that can represent the text buffer
 -- of an editor.

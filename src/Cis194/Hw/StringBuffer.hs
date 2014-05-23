@@ -3,7 +3,7 @@ module StringBuffer where
 
 import Data.Monoid
 
-import Buffer
+import Cis194.Hw.Buffer
 
 instance Buffer String where
   toString     = id
