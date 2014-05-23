@@ -8,7 +8,6 @@ import Data.Monoid
 import Cis194.Hw.Sized
 import Cis194.Hw.Scrabble
 import Cis194.Hw.Buffer
-import Data.Monoid
 
 data JoinList m a = Empty
                    | Single m a
