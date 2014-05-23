@@ -3,6 +3,7 @@ module Cis194.Hw.Party where
 import Cis194.Hw.Employee
 import Data.Monoid
 import Data.Tree
+import Debug.Trace
 
 -- ** Utility function
 
@@ -10,6 +11,8 @@ startGuestList :: String -> Integer -> GuestList
 startGuestList s i
   | i > 0     = GL [Emp { empFun = i, empName = s}] i
   | otherwise = GL [] 0
+
+foo = Node {rootLabel = 'b', subForest = [Node {rootLabel = 'a', subForest = []}]}
 
 -- ** Exercise 1
 --
@@ -75,14 +78,13 @@ moreFun = max
 -- notes from Week 7, or infer the proper type(s) from the remainder
 -- of this assignment.)
 
--- isn't this treeFold1 ??
-treeFold :: (a -> [b] -> b) -> Tree a -> b
-treeFold f (Node value subForest) = f value $ map (treeFold f) subForest
-{-treeFold f i Node { rootLabel = cargo, subForest = [] } = f i cargo-}
-{-treeFold f i Node { rootLabel = cargo, subForest = s  } = foldl (treeFold f) i s-}
-{-treeFold f Node { rootLabel = cargo, subForest = s } = f cargo-}
-{-treeFold f init Node { rootLabel = cargo, subForest = s } = foldl (treeFold f) init s-}
-{-treeFold f z@(Node { rootLabel = cargo, subForest = s }) = foldl (\acc val -> acc) (f cargo) s-}
+
+-- assume (treeFold f) means 'gimme a value (to be used as default)
+-- and a tree and i'll reduce that tree into a value of that same
+-- type.
+treeFold :: (a -> b -> b) -> b -> Tree a -> b
+treeFold f i (Node value [])    = f value i
+treeFold f i (Node value trees) = f value $ foldr (flip $ treeFold f) i trees
 
 -- ** Exercise 3
 --
