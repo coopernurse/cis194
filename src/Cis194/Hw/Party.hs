@@ -107,6 +107,9 @@ nextLevel boss pairs = (withBoss, withoutBoss) where
   withBoss    = glCons boss $ mconcat $ map (snd) pairs
   withoutBoss = mconcat $ map (uncurry moreFun) pairs
 
+nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
+nextLevel e@(Emp name fun) [] = (GL [e] fun, GL [] 0)
+
 -- ** Exercise 4
 --
 -- Finally, put all of this together to define
