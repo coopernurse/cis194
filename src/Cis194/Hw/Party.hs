@@ -104,6 +104,9 @@ treeFold f i (Node value trees) = f value $ foldr (flip $ treeFold f) i trees
 -- includes Bob, and the overall best guest list that doesn’t
 -- include Bob.
 
+nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
+nextLevel e@(Emp name fun) [] = (GL [e] fun, GL [] 0)
+
 -- ** Exercise 4
 --
 -- Finally, put all of this together to define
