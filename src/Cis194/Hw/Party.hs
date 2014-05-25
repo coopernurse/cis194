@@ -105,7 +105,10 @@ treeFold f i (Node value trees) = f value $ foldr (flip $ treeFold f) i trees
 -- include Bob.
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel e@(Emp name fun) [] = (GL [e] fun, GL [] 0)
+nextLevel boss []    = (GL [boss] (empFun boss), GL [] 0)
+nextLevel boss pairs = (withBoss, withoutBoss) where
+  withBoss    = glCons boss $ mconcat $ map (snd) pairs
+  withoutBoss = mconcat $ map (uncurry moreFun) pairs
 
 -- ** Exercise 4
 --
