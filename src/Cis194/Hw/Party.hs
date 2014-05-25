@@ -6,15 +6,6 @@ import Data.Tree
 import Debug.Trace
 import Employee
 
--- ** Utility function
-
-startGuestList :: String -> Integer -> GuestList
-startGuestList s i
-  | i > 0     = GL [Emp { empFun = i, empName = s}] i
-  | otherwise = GL [] 0
-
-foo = Node {rootLabel = 'b', subForest = [Node {rootLabel = 'a', subForest = []}]}
-
 -- ** Exercise 1
 --
 -- 1.1
@@ -103,12 +94,6 @@ treeFold f (Node value nodes) = f value $ map (treeFold f) $ nodes
 -- includes Bob, and the overall best guest list that doesn’t
 -- include Bob.
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel boss pairs = (withBoss, withoutBoss) where
-  withBoss    = glCons boss $ mconcat $ map (snd) pairs
-  withoutBoss = mconcat $ map (uncurry moreFun) pairs
-
-nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel boss []    = (GL [boss] (empFun boss), GL [] 0)
 nextLevel boss pairs = (withBoss, withoutBoss) where
   withBoss    = glCons boss $ mconcat $ map (snd) pairs
   withoutBoss = mconcat $ map (uncurry moreFun) pairs
