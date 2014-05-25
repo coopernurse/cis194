@@ -53,7 +53,7 @@ instance Monoid GuestList where
 -- not matter which is returned.)
 
 moreFun :: GuestList -> GuestList -> GuestList
-moreFun = max
+moreFun gl1 gl2 = max gl1 gl2
 
 -- ** Exercise 2
 --
