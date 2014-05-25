@@ -52,11 +52,11 @@ spec = do
       moreFun empty joeList `shouldBe` joeList
       moreFun joeList sueList `shouldBe` joeList
 
-  describe "treeFold" $ do
-    it "reduces the trees down to a single value" $ do
-      treeFold (*) 5 (Node 10 []) `shouldBe` 50
-      treeFold (:) "" tree_d `shouldBe` "dea"
-      treeFold (+) 0 (Node 10 [Node 5 [], Node 2 []]) `shouldBe` 17
+  {-describe "treeFold" $ do-}
+    {-it "reduces the trees down to a single value" $ do-}
+      {-treeFold (*) 5 (Node 10 []) `shouldBe` 50-}
+      {-treeFold (:) "" tree_d `shouldBe` "dea"-}
+      {-treeFold (+) 0 (Node 10 [Node 5 [], Node 2 []]) `shouldBe` 17-}
 
   describe "nextLevel" $ do
     it "handles empty subtrees" $ do

@@ -5,15 +5,6 @@ import Data.Monoid
 import Data.Tree
 import Debug.Trace
 
--- ** Utility function
-
-startGuestList :: String -> Integer -> GuestList
-startGuestList s i
-  | i > 0     = GL [Emp { empFun = i, empName = s}] i
-  | otherwise = GL [] 0
-
-foo = Node {rootLabel = 'b', subForest = [Node {rootLabel = 'a', subForest = []}]}
-
 -- ** Exercise 1
 --
 -- 1.1
@@ -82,9 +73,12 @@ moreFun gl1 gl2 = max gl1 gl2
 -- assume (treeFold f) means 'gimme a value (to be used as default)
 -- and a tree and i'll reduce that tree into a value of that same
 -- type.
-treeFold :: (a -> b -> b) -> b -> Tree a -> b
-treeFold f i (Node value [])    = f value i
-treeFold f i (Node value trees) = f value $ foldr (flip $ treeFold f) i trees
+{-treeFold :: (a -> b -> b) -> b -> Tree a -> b-}
+{-treeFold f i (Node value [])    = f value i-}
+{-treeFold f i (Node value trees) = f value $ foldr (flip $ treeFold f) i trees-}
+
+treeFold :: (a -> [b] -> b) -> Tree a -> b
+treeFold f (Node value nodes) = f value $ map (treeFold f) $ nodes
 
 -- ** Exercise 3
 --
@@ -105,7 +99,6 @@ treeFold f i (Node value trees) = f value $ foldr (flip $ treeFold f) i trees
 -- include Bob.
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel boss []    = (GL [boss] (empFun boss), GL [] 0)
 nextLevel boss pairs = (withBoss, withoutBoss) where
   withBoss    = glCons boss $ mconcat $ map (snd) pairs
   withoutBoss = mconcat $ map (uncurry moreFun) pairs
@@ -119,6 +112,13 @@ nextLevel boss pairs = (withBoss, withoutBoss) where
 -- which takes a company hierarchy as input and outputs a fun-maximizing
 -- guest list. You can test your function on testCompany, provided in
 -- Employee.hs.
+
+maxFun :: Tree Employee -> GuestList
+maxFun tree = uncurry moreFun $ treeFold nextLevel tree
+{-maxFun (Node boss underlings) = moreFun $ nextLevel boss $-}
+{-maxFun t@(Node boss underlings) = moreFun (withBoss, withoutBoss) where-}
+  {-withBoss = glCons boss $ map (maxFun) underlings-}
+  {-withoutBoss =-}
 
 -- ** Exercise 5
 --
