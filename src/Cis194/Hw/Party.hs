@@ -70,8 +70,8 @@ glPrint gl = do
 
 -- main reads company hierarchy from company.txt and prints a formatted guest list
 -- sorted by first name
-main :: IO () 
-main = do
+main' :: IO () 
+main' = do
   tStr <- readFile "data/company.txt"
   glPrint $ maxFun $ read tStr
 
