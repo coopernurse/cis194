@@ -44,30 +44,44 @@ first f (x, y) = (f x, y)
 -- value. However, if either p1 or p2 fails then the whole thing should also fail (put another
 -- way, p1 <*> p2 only succeeds if both p1 and p2 succeed).
 
--- Ex. 3a - Create a parser:
---
+-- Ex. 3a - Create a parser which expects to see the
+-- characters ’a’ and ’b’ and returns them as a pair
 
 abParser :: Parser (Char, Char)
 abParser = Parser f
   where
-    f ('a':'b':xs) = Just (('a', 'b'), xs)
-    f _ = Nothing
+    f xs = case runParser (char 'a') xs of
+      (Just (c1, rest1)) -> case runParser (char 'b') rest1 of
+        (Just (c2, rest2)) -> Just ((c1, c2), rest2)
+        (_) -> Nothing
+      (_) -> Nothing
 
---
--- which expects to see the characters ’a’ and ’b’ and returns them as a pair
+-- Ex. 3b - Create a parser which acts in the same way as
+-- abParser but returns () instead of 'a' and 'b'
+abParser_ :: Parser ()
+abParser_ = Parser f
+  where
+    f xs = case runParser (char 'a') xs of
+      (Just (_, rest1)) -> case runParser (char 'b') rest1 of
+        (Just (_, rest2)) -> Just ((), rest2)
+        (_) -> Nothing
+      (_) -> Nothing
 
--- Ex. 3b - Create a parser:
---
---   abParser_ :: Parser ()
---
--- which acts in the same way as abParser but returns () instead of 'a' and 'b'
+-- Ex. 3c - Create a parser which reads two integer values
+-- separated by a space and returns the integer values in a
+-- list. You should use the provided posInt to parse the
+-- integer values.
 
--- Ex. 3c - Create a parser:
---
---   intPair
---
--- which reads two integer values separated by a space and returns the integer
--- values in a list. You should use the provided posInt to parse the integer values.
+intPair :: Parser ([Integer])
+intPair = Parser f
+  where
+    f xs = case runParser posInt xs of
+      (Just (n1, rest1)) -> case runParser (char ' ') rest1 of
+        (Just (_, rest2)) -> case runParser posInt rest2 of
+          (Just (n2, rest3)) -> Just ([n1, n2], rest3)
+          (_) -> Nothing
+        (_) -> Nothing
+      (_) -> Nothing
 
 
 -- Ex. 4 - Write an Alternative instance for Parser
