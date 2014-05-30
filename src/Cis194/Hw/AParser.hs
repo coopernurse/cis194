@@ -35,6 +35,13 @@ posInt = Parser f
 first :: (a -> b) -> (a, c) -> (b, c)
 first f (x, y) = (f x, y)
 
+instance Functor Parser where
+  fmap f1 p = Parser f2
+    where
+      f2 xs = case runParser p xs of
+        Nothing  -> Nothing
+        (Just v) -> Just $ first f1 v
+
 -- Ex. 2 - implement an Applicative instance for Parser
 --
 --  pure a represents the parser which consumes no input and successfully returns a result of a.
