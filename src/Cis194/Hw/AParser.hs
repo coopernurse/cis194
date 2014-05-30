@@ -44,12 +44,25 @@ instance Functor Parser where
 
 -- Ex. 2 - implement an Applicative instance for Parser
 --
---  pure a represents the parser which consumes no input and successfully returns a result of a.
---  p1 <*> p2 represents the parser which ﬁrst runs p1 (which will consume some input and
--- produce a function), then passes the remaining input to p2 (which consumes more input
--- and produces some value), then returns the result of applying the function to the
--- value. However, if either p1 or p2 fails then the whole thing should also fail (put another
--- way, p1 <*> p2 only succeeds if both p1 and p2 succeed).
+-- A. pure a represents the parser which consumes no input
+--    and successfully returns a result of a.
+--
+-- B. p1 <*> p2 represents the parser which ﬁrst runs p1
+--    (which will consume some input and produce a
+--    function), then passes the remaining input to p2
+--    (which consumes more input and produces some value),
+--    then returns the result of applying the function to
+--    the value. However, if either p1 or p2 fails then the
+--    whole thing should also fail (put another way, p1 <*>
+--    p2 only succeeds if both p1 and p2 succeed).
+
+instance Applicative Parser where
+  pure x = Parser $ \_ -> Just (x, "")
+  (Parser p1) <*> (Parser p2) = Parser $ \s -> case p1 s of
+    Nothing -> Nothing
+    (Just (f, xs)) -> case p2 xs of
+      Nothing -> Nothing
+      (Just (y, ys)) -> Just (f y, ys)
 
 -- Ex. 3a - Create a parser which expects to see the
 -- characters ’a’ and ’b’ and returns them as a pair
