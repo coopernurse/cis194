@@ -58,34 +58,20 @@ instance Functor Parser where
 
 instance Applicative Parser where
   pure x = Parser $ \_ -> Just (x, "")
-  (Parser p1) <*> (Parser p2) = Parser $ \s -> case p1 s of
-    Nothing -> Nothing
-    (Just (f, xs)) -> case p2 xs of
-      Nothing -> Nothing
-      (Just (y, ys)) -> Just (f y, ys)
+  (Parser p1) <*> p2 = Parser $ \s -> case p1 s of
+    Nothing        -> Nothing
+    (Just (f, xs)) -> runParser (f <$> p2) xs
 
 -- Ex. 3a - Create a parser which expects to see the
 -- characters ’a’ and ’b’ and returns them as a pair
 
 abParser :: Parser (Char, Char)
-abParser = Parser f
-  where
-    f xs = case runParser (char 'a') xs of
-      (Just (c1, rest1)) -> case runParser (char 'b') rest1 of
-        (Just (c2, rest2)) -> Just ((c1, c2), rest2)
-        (_) -> Nothing
-      (_) -> Nothing
+abParser = (\x y -> (x, y)) <$> char 'a' <*> char 'b'
 
 -- Ex. 3b - Create a parser which acts in the same way as
 -- abParser but returns () instead of 'a' and 'b'
 abParser_ :: Parser ()
-abParser_ = Parser f
-  where
-    f xs = case runParser (char 'a') xs of
-      (Just (_, rest1)) -> case runParser (char 'b') rest1 of
-        (Just (_, rest2)) -> Just ((), rest2)
-        (_) -> Nothing
-      (_) -> Nothing
+abParser_ = (\x y -> ()) <$> char 'a' <*> char 'b'
 
 -- Ex. 3c - Create a parser which reads two integer values
 -- separated by a space and returns the integer values in a
@@ -93,16 +79,7 @@ abParser_ = Parser f
 -- integer values.
 
 intPair :: Parser ([Integer])
-intPair = Parser f
-  where
-    f xs = case runParser posInt xs of
-      (Just (n1, rest1)) -> case runParser (char ' ') rest1 of
-        (Just (_, rest2)) -> case runParser posInt rest2 of
-          (Just (n2, rest3)) -> Just ([n1, n2], rest3)
-          (_) -> Nothing
-        (_) -> Nothing
-      (_) -> Nothing
-
+intPair = (\x y z -> x:z:[]) <$> posInt <*> char ' ' <*> posInt
 
 -- Ex. 4 - Write an Alternative instance for Parser
 --
