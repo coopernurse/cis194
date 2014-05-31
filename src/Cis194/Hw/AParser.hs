@@ -86,11 +86,19 @@ intPair = (\x y z -> x:z:[]) <$> posInt <*> char ' ' <*> posInt
 -- See: http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Applicative.html#t:Alternative
 --
 -- empty represents the parser which always fails.
--- p1 <|> p2 represents the parser which ﬁrst tries running p1. If p1 succeeds then p2 is
--- ignored and the result of p1 is returned.  Otherwise, if p1 fails, then p2 is tried instead.
+-- p1 <|> p2 represents the parser which ﬁrst tries running
+-- p1. If p1 succeeds then p2 is ignored and the result of
+-- p1 is returned.  Otherwise, if p1 fails, then p2 is
+-- tried instead.
 --
--- Hint: there is already an Alternative instance for Maybe which you may find useful.
+-- Hint: there is already an Alternative instance for Maybe
+-- which you may find useful.
 
+instance Alternative Parser where
+  empty = Parser (\s -> Nothing)
+  p1 <|> p2 = Parser $ \s -> case runParser p1 s of
+    Nothing -> runParser p2 s
+    x       -> x
 
 -- Ex. 5 - Implement a parser:
 --
