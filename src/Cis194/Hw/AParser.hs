@@ -102,6 +102,10 @@ instance Alternative Parser where
 
 -- Ex. 5 - Implement a parser:
 --
---  intOrUppercase :: Parser ()
+-- intOrUppercase :: Parser ()
 --
--- which parses either an integer value or an uppercase character, and fails otherwise.
+-- which parses either an integer value or an uppercase
+-- character, and fails otherwise.
+
+intOrUppercase :: Parser ()
+intOrUppercase = const () <$> satisfy isUpper <|> const () <$> posInt
