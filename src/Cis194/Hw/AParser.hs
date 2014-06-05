@@ -57,7 +57,7 @@ instance Functor Parser where
 --    p2 only succeeds if both p1 and p2 succeed).
 
 instance Applicative Parser where
-  pure x = Parser $ \_ -> Just (x, "")
+  pure x = Parser $ \s -> Just (x, s)
   (Parser p1) <*> p2 = Parser $ \s -> case p1 s of
     Nothing        -> Nothing
     (Just (f, xs)) -> runParser (f <$> p2) xs
@@ -105,9 +105,3 @@ instance Alternative Parser where
 --  intOrUppercase :: Parser ()
 --
 -- which parses either an integer value or an uppercase character, and fails otherwise.
-
-
-
-
-
-
