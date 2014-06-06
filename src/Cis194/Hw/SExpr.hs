@@ -12,19 +12,33 @@ import Data.Char
 --  1. Parsing repetitions
 ------------------------------------------------------------
 
+--
+-- zeroOrMore takes a parser as input and runs it consecutively as 
+-- many times as possible (which could be none, if it fails right 
+-- away), returning a list of the results. zeroOrMore always succeeds.
+--
+--  ghci> runParser (zeroOrMore (satisfy isUpper)) "ABCdEfgH" 
+--        Just ("ABC","dEfgH")
+--
+zeroOrMore :: Parser a -> Parser [a]
+zeroOrMore p = some p <|> pure []
+
+--zeroOrMore p = Parser (\xs -> Just (zeroOrMoreRecur [] p xs))
+--zeroOrMoreRecur :: [a] -> Parser a -> [Char] -> ([a], [Char])
+--zeroOrMoreRecur acc p xs = case runParser p xs of
+--  Nothing -> (acc, xs)
+--  Just (a, rest) -> zeroOrMoreRecur (acc ++ [a]) p rest
+
+--
+-- oneOrMore is similar, except that it requires the input parser
+-- to succeed at least once. If the input parser fails right away then
+-- oneOrMore also fails.
+--
 -- Hint: To parse one or more occurrences of p, run p once
 -- and then parse zero or more occurrences of p.
-
+--
 oneOrMore :: Parser a -> Parser [a]
-oneOrMore = some
-{-oneOrMore p = (:) <$> p <*> zeroOrMore p-}
-
--- To parse zero or more occurrences of p, try parsing one
--- or more; if that fails, return the empty list.
-
-zeroOrMore :: Parser a -> Parser [a]
-zeroOrMore = many
-{-zeroOrMore p = oneOrMore p <|> pure []-}
+oneOrMore p = (:) <$> p <*> zeroOrMore p
 
 ------------------------------------------------------------
 --  2. Utilities
@@ -34,7 +48,7 @@ zeroOrMore = many
 -- more whitespace characters.
 
 spaces :: Parser String
-spaces = many $ char ' '
+spaces = zeroOrMore (char ' ')
 
 -- Next, ident should parse an identifier, which for our
 -- purposes will be an alphabetic character (use isAlpha)
@@ -42,7 +56,7 @@ spaces = many $ char ' '
 -- isAlphaNum).
 
 ident :: Parser String
-ident = (:) <$> (satisfy isAlpha) <*> many (satisfy isAlphaNum)
+ident = (\a b -> a : b) <$> (satisfy isAlpha) <*> zeroOrMore (satisfy isAlphaNum)
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
@@ -61,3 +75,7 @@ data Atom = N Integer | I Ident
 data SExpr = A Atom
            | Comb [SExpr]
   deriving Show
+
+parseSExpr :: Parser SExpr
+parseSExpr = undefined
+
