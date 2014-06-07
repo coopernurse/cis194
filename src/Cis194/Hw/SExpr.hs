@@ -80,8 +80,8 @@ parseAtom :: Parser SExpr
 parseAtom = (A . N <$> posInt) <|> (A . I <$> ident)
 
 parseComb :: Parser SExpr
-parseComb = (\_ xs _ -> Comb xs) <$> (char '(') <*> some parseSExpr <*> (char ')')
+parseComb = Comb <$> ((char '(') *> some parseSExpr <* (char ')'))
 
 parseSExpr :: Parser SExpr
-parseSExpr = (\_ xs _ -> xs) <$> spaces <*> (parseAtom <|> parseComb) <*> spaces
+parseSExpr = spaces *> (parseAtom <|> parseComb) <* spaces
 
