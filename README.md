@@ -21,6 +21,12 @@ On a mac:
 cabal configure --enable-tests && cabal build && cabal test
 ```
 
+OR
+
+```
+runhaskell -isrc -itest test/Spec.hs
+```
+
 ## Using QuickCheck in ghci
 
     :m +Test.QuickCheck
