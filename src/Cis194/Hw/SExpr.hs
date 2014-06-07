@@ -55,9 +55,9 @@ type Ident = String
 
 -- An "atom" is either an integer value or an identifier.
 data Atom = N Integer | I Ident
-  deriving Show
+  deriving (Show, Eq)
 
 -- An S-expression is either an atom, or a list of S-expressions.
 data SExpr = A Atom
            | Comb [SExpr]
-  deriving Show
+  deriving (Show, Eq)
