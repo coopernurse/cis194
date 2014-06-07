@@ -39,3 +39,24 @@ spec = do
       runParser ident "foo33fA" `shouldBe` Just ("foo33fA","")
       runParser ident "2bad" `shouldBe` Nothing
       runParser ident "" `shouldBe` Nothing
+
+  describe "parseSExpr" $ do
+    it "parses an integer" $ do
+      runParser parseSExpr "5" `shouldBe` Just (A (N 5),"")
+
+    it "ignores leading and trailing spaces" $ do
+      runParser parseSExpr "   10  " `shouldBe` Just (A (N 10),"")
+
+    it "parses an identifier" $ do
+      runParser parseSExpr "foo3" `shouldBe` Just (A (I "foo3"),"")
+
+    it "parsers compound S expressions" $ do
+      runParser parseSExpr "(bar (foo) 3 5 874)" `shouldBe` 
+        Just (Comb [A (I "bar"), (Comb [A (I "foo")]), A (N 3), A (N 5), A (N 874)], "")
+      runParser parseSExpr "(((lambda x (lambda y (plus x y))) 3) 5)" `shouldBe` 
+        Just (Comb [Comb [Comb [A (I "lambda"), A (I "x"), 
+          Comb [A (I "lambda"), A (I "y"), 
+            Comb [A (I "plus"), A (I "x"), A (I "y")] ] ], A (N 3) ], A (N 5)], "")
+      runParser parseSExpr " ( lots of ( spaces in ) this ( one ) ) " `shouldBe`
+        Just (Comb [A (I "lots"), A (I "of"), Comb [A (I "spaces"), A (I "in")], A (I "this"), Comb [A (I "one")] ], "")
+
