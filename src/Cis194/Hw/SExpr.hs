@@ -21,7 +21,7 @@ import Data.Char
 --        Just ("ABC","dEfgH")
 --
 zeroOrMore :: Parser a -> Parser [a]
-zeroOrMore p = some p <|> pure []
+zeroOrMore = many
 
 --zeroOrMore p = Parser (\xs -> Just (zeroOrMoreRecur [] p xs))
 --zeroOrMoreRecur :: [a] -> Parser a -> [Char] -> ([a], [Char])
@@ -38,7 +38,7 @@ zeroOrMore p = some p <|> pure []
 -- and then parse zero or more occurrences of p.
 --
 oneOrMore :: Parser a -> Parser [a]
-oneOrMore p = (:) <$> p <*> zeroOrMore p
+oneOrMore = some
 
 ------------------------------------------------------------
 --  2. Utilities
