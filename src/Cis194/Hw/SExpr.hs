@@ -12,14 +12,14 @@ import Data.Char
 --  1. Parsing repetitions
 ------------------------------------------------------------
 
-consP :: Parser a -> Parser [a] -> Parser [a]
-consP p ps = liftA2 (:) p ps 
+(<:>) :: Applicative f => f a -> f [a] -> f [a]
+p <:> ps = liftA2 (:) p ps 
 
 zeroOrMore :: Parser a -> Parser [a]
-zeroOrMore p = consP p (zeroOrMore p) <|> pure []
+zeroOrMore p = p <:> zeroOrMore p <|> pure []
 
 oneOrMore :: Parser a -> Parser [a]
-oneOrMore p = consP p (zeroOrMore p)
+oneOrMore p = p <:> zeroOrMore p
 
 ------------------------------------------------------------
 --  2. Utilities
@@ -29,7 +29,7 @@ spaces :: Parser String
 spaces = zeroOrMore (satisfy isSpace)
 
 ident :: Parser String
-ident = consP (satisfy isAlpha) (zeroOrMore (satisfy isAlphaNum))
+ident = satisfy isAlpha <:> zeroOrMore (satisfy isAlphaNum)
 
 ------------------------------------------------------------
 --  3. Parsing S-expressions
@@ -53,7 +53,10 @@ parseAtom :: Parser Atom
 parseAtom = (N <$> posInt) <|> (I <$> ident)
 
 parseSExpr :: Parser SExpr
-parseSExpr = spaces *> 
-              ((A <$> parseAtom) <|> 
-              ((char '(') *> (Comb <$> zeroOrMore parseSExpr) <* (char ')'))) 
-             <* spaces
+parseSExpr = spaces *> ( 
+                A <$> parseAtom 
+                <|> 
+                char '(' *>  (Comb <$> zeroOrMore parseSExpr) <* char ')'
+              ) <* spaces
+
+
