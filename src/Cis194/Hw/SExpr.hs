@@ -54,10 +54,37 @@ ident = (:) <$> (satisfy isAlpha) <*> many (satisfy isAlphaNum)
 type Ident = String
 
 -- An "atom" is either an integer value or an identifier.
-data Atom = N Integer | I Ident
+data Atom = N Integer
+          | I Ident
   deriving (Show, Eq)
 
 -- An S-expression is either an atom, or a list of S-expressions.
 data SExpr = A Atom
            | Comb [SExpr]
   deriving (Show, Eq)
+
+-- Textually, S-expressions can optionally begin and end
+-- with any number of spaces; after throwing away leading
+-- and trailing spaces they consist of either an atom, or
+-- an open parenthesis followed by one or more S-expressions
+-- followed by a close parenthesis.
+--
+-- For example, the following are all valid S-expressions:
+--  5
+--  foo3
+--  (bar (foo) 3 5 874)
+--  (((lambda x (lambda y (plus x y))) 3) 5)
+--  (   lots  of   (  spaces   in  )  this ( one ) )
+
+parseAtom :: Parser Atom
+parseAtom = (pure (N) <*> posInt) <|> (pure (I) <*> ident)
+
+parseSExpr :: Parser SExpr
+parseSExpr = spaces *> parse <* spaces
+  where parse = pure (A) <*> parseAtom <|> (pure (Comb) <*> (char '(' *> some parseSExpr <* char ')'))
+
+sumParse :: Parser Integer
+sumParse = spaces *> (hit <|> miss) <* spaces
+  where
+    hit  = posInt
+    miss = foldl1 (+) <$> (char '(' *> some sumParse <* char ')')
