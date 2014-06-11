@@ -31,7 +31,7 @@ type Army = Int
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
                  deriving (Show)
 
--- EX 1
+-- EX 2
 -- write a function with the type
 --
 -- battle :: Battlefield -> Rand StdGen Battlefield
@@ -96,3 +96,19 @@ battle b@(Battlefield as ds) =
   where
     (aParticipated, aChilled) = atk as
     (dParticipated, dChilled) = dfd ds
+
+-- EX 3
+-- Now implement a function
+-- ￼
+-- invade :: Battlefield -> Rand StdGen Battlefield
+--
+-- which simulates an entire invasion attempt, that is,
+-- repeated calls to battle until there are no defenders
+-- remaining, or fewer than two attackers.
+
+invade :: Battlefield -> Rand StdGen Battlefield
+invade initial = battle initial >>= check
+  where
+    check result@(Battlefield attackers defenders)
+      | defenders == 0 || attackers < 2 = return result
+      | otherwise = invade result
