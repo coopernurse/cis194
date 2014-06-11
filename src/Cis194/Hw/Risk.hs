@@ -79,18 +79,17 @@ dfd a = (participated, chilled)
 -- The attacking player sorts their dice rolls in
 -- descending order. The defending player does the same.
 
-pairRolls :: [DieValue] -> [DieValue] -> [(Int, Int)]
-pairRolls atkRolls defRolls = zipWith (\aRoll dRoll -> if aRoll > dRoll then (0, 1) else (1, 0)) (sort atkRolls) (sort defRolls)
-
-casualties :: [(Int, Int)] -> (Int, Int)
-casualties pairs = foldl1 (\(a, b) (c, d) -> (a + c, b + d)) pairs
+casualties :: [DieValue] -> [DieValue] -> (Int, Int)
+casualties atkRolls dfdRolls = foldl (reducer) (0, 0) pairs
+  where pairs = zipWith (compare) (sort atkRolls) (sort dfdRolls)
+        reducer (a, d) result = if result == GT then (a, d+1) else (a+1, d)
 
 battle :: Battlefield -> Rand StdGen Battlefield
 battle b@(Battlefield as ds) =
   replicateM aParticipated die >>= \atkRolls ->
   replicateM dParticipated die >>= \dfdRolls ->
   let
-    (aCasualties, dCasualties) = casualties $ pairRolls atkRolls dfdRolls
+    (aCasualties, dCasualties) = casualties atkRolls dfdRolls
   in
     return $ Battlefield (aChilled + aParticipated - aCasualties) (dChilled + dParticipated - dCasualties)
   where
@@ -130,15 +129,5 @@ invade initial = battle initial >>= check
 
 successProb :: Battlefield -> Rand StdGen Double
 successProb b =
-  replicateM 1000 (simulate b) >>= \simulations ->
-  let
-    (atk, dfd) = foldl (\(accAtk, accDfd) (atk, dfd) -> (accAtk + atk, accDfd + dfd)) (0, 0) simulations
-  in
-    return (fromIntegral atk / 1000.0)
-
-simulate :: Battlefield -> Rand StdGen (Integer, Integer)
-simulate b = invade b >>= check
-  where
-    check result@(Battlefield attackers defenders)
-      | defenders == 0 = return (1, 0)
-      | otherwise      = return (0, 1)
+  replicateM 1000 (invade b) >>= \results ->
+  return $ fromIntegral (length $ filter ((==0) . defenders) results) / 1000.0
