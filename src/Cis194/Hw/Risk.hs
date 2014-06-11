@@ -112,3 +112,33 @@ invade initial = battle initial >>= check
     check result@(Battlefield attackers defenders)
       | defenders == 0 || attackers < 2 = return result
       | otherwise = invade result
+
+-- EX 4
+-- Finally, implement a function
+--
+-- successProb :: Battlefield -> Rand StdGen Double
+--
+-- which runs invade 1000 times, and uses the results to
+-- compute a Double between 0 and 1 representing the
+-- estimated probability that the attacking army will
+-- completely destroy the defending army.
+--
+-- For example, if the defending army is destroyed in 300
+-- of the 1000 simulations (but the attacking army is
+-- reduced to 1 unit in the other 700), successProb should
+-- return 0.3.
+
+successProb :: Battlefield -> Rand StdGen Double
+successProb b =
+  replicateM 1000 (simulate b) >>= \simulations ->
+  let
+    (atk, dfd) = foldl (\(accAtk, accDfd) (atk, dfd) -> (accAtk + atk, accDfd + dfd)) (0, 0) simulations
+  in
+    return (fromIntegral atk / 1000.0)
+
+simulate :: Battlefield -> Rand StdGen (Integer, Integer)
+simulate b = invade b >>= check
+  where
+    check result@(Battlefield attackers defenders)
+      | defenders == 0 = return (1, 0)
+      | otherwise      = return (0, 1)
