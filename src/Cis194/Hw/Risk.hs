@@ -2,7 +2,9 @@
 
 module Cis194.Hw.Risk where
 
+import Control.Monad
 import Control.Monad.Random
+import Data.List
 
 ------------------------------------------------------------
 -- Die values
@@ -25,7 +27,7 @@ die = getRandom
 
 type Army = Int
 
-data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
+data Battlefield = Battlefield { attackers :: Army, defenders :: Army } deriving (Show, Eq)
 
 -----------------------------
 -- Ex 2. 
@@ -38,7 +40,21 @@ data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
 -- with the maximum number of units they are allowed
 --
 battle :: Battlefield -> Rand StdGen Battlefield
-battle = undefined
+battle b = do
+  attRolls <- sequence $ replicate (max 3 att) die             -- roll die max of 3 times
+  defRolls <- sequence $ replicate (max 2 def) die             -- roll die max of 2 times
+  let attWin = zipWith (>) (sortR attRolls) (sortR defRolls)   -- creates [Bool] where True=attacker won
+  return $ Battlefield (survivors att False attWin) (survivors def True attWin)
+  where
+    att = attackers b 
+    def = defenders b
+    sortR rs = reverse . sort $ map unDV rs            -- turn rolls into [Int] and sort in descending order
+    survivors orig lose attWin = 
+      max 0 (orig - (length $ filter (==lose) attWin)) -- subtract # losses from orig count
+
+-- notes:
+-- to print 3 rolls in repl:
+-- mapM evalRandIO $ replicate 3 die
 
 -----------------------------
 -- Ex 3. 
@@ -49,7 +65,11 @@ battle = undefined
 -- attackers.
 --
 invade :: Battlefield -> Rand StdGen Battlefield
-invade = undefined
+invade b = do
+  result <- battle b
+  if (attackers result) < 2 || (defenders result) < 1
+    then return result   -- either attackers or defenders are depleted. invasion over.
+    else invade result   -- fight another round
 
 -----------------------------
 -- Ex 4. 
@@ -64,7 +84,10 @@ invade = undefined
 -- 700), successProb should return 0.3.
 --
 successProb :: Battlefield -> Rand StdGen Double
-successProb = undefined
+successProb b = do
+  results <- replicateM 1000 $ invade b                          -- invade 1000 times
+  let wins = length $ filter (\r -> (defenders r) == 0) results  -- get # of results where attackers won
+  return ((fromIntegral wins) / 1000.0)
 
 -----------------------------
 -- Ex 5. (Optional)
