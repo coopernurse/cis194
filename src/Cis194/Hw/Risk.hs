@@ -52,11 +52,8 @@ data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
 atk :: Army -> (Army, Army)
 atk a
   | a == 0    = (0, 0)
-  | a == 1    = (0, 1)
-  | a == 2    = (1, 1)
-  | a == 3    = (2, 1)
   | otherwise = (participated, chilled)
-  where participated = min (3) a
+  where participated = min (a-1) 3
         chilled      = a - participated
 
 -- rule 2:
