@@ -81,7 +81,7 @@ dfd a = (participated, chilled)
 
 casualties :: [DieValue] -> [DieValue] -> (Int, Int)
 casualties atkRolls dfdRolls = foldl (reducer) (0, 0) pairs
-  where pairs = zipWith (compare) (sort atkRolls) (sort dfdRolls)
+  where pairs = zipWith (flip compare) (sort atkRolls) (sort dfdRolls)
         reducer (a, d) result = if result == GT then (a, d+1) else (a+1, d)
 
 battle :: Battlefield -> Rand StdGen Battlefield
