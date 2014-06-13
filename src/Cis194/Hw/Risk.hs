@@ -44,54 +44,19 @@ data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
 -- attack or defend with the maximum number of units they
 -- are allowed.
 
--- rule 1:
--- The attacking player may attack with up to three units
--- at a time. However, they must always leave at least one
--- unit behind.
-
-atk :: Army -> (Army, Army)
-atk a
-  | a == 0    = (0, 0)
-  | otherwise = (participated, chilled)
-  where participated = min (a-1) 3
-        chilled      = a - participated
-
--- rule 2:
--- The defending player may defend with up to two units (or
--- only one if that is all they have).
-
-dfd :: Army -> (Army, Army)
-dfd a = (participated, chilled)
-  where participated = min 2 a
-        chilled      = a - participated
-
--- rule 3:
--- To determine the outcome of a single battle, the
--- attacking and defending players each roll one six-sided
--- die for every unit they have attacking or defending. So
--- the attacking player rolls one, two, or three dice, and
--- the defending player rolls one or two dice.
-
--- rule 4:
--- The attacking player sorts their dice rolls in
--- descending order. The defending player does the same.
-
 casualties :: [DieValue] -> [DieValue] -> (Int, Int)
 casualties atkRolls dfdRolls = foldl (reducer) (0, 0) pairs
   where pairs = zipWith (flip compare) (sort atkRolls) (sort dfdRolls)
         reducer (a, d) result = if result == GT then (a, d+1) else (a+1, d)
 
 battle :: Battlefield -> Rand StdGen Battlefield
-battle b@(Battlefield as ds) =
-  replicateM aParticipated die >>= \atkRolls ->
-  replicateM dParticipated die >>= \dfdRolls ->
+battle b@(Battlefield a d) =
+  replicateM (min (a - 1) 3) die >>= \aRolls ->
+  replicateM (min d 2) die       >>= \dRolls ->
   let
-    (aCasualties, dCasualties) = casualties atkRolls dfdRolls
+    c = casualties aRolls dRolls
   in
-    return $ Battlefield (aChilled + aParticipated - aCasualties) (dChilled + dParticipated - dCasualties)
-  where
-    (aParticipated, aChilled) = atk as
-    (dParticipated, dChilled) = dfd ds
+    return $ Battlefield (a - fst c) (d - snd c)
 
 -- EX 3
 -- Now implement a function
