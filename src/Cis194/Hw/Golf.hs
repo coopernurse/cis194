@@ -16,15 +16,15 @@ skips x@(_:_) = map (skip x) [0..length x - 1]
 -- by chunking into sub-lists of length 3
 -- and then comparing items in sub-lists
 localMaxima :: [Integer] -> [Integer]
-localMaxima xs = mapMaybe match (chunk 3 xs)
+localMaxima xs = mapMaybe match (chunk xs)
   where match (x:y:z:_) = if y > x && y > z then Just y else Nothing
         match _ = Nothing
 
 -- chunk a list into sub-lists of length n
 -- e.g. chunk 2 [1, 2, 3] -> [[1, 2], [2, 3]]
-chunk :: Int -> [a] -> [[a]]
-chunk n (x:l@(y:z:_)) = [x, y, z] : chunk n l
-chunk _ _ = []
+chunk :: [a] -> [[a]]
+chunk (x:l@(y:z:_)) = [x, y, z] : chunk l
+chunk _ = []
 
 histogram :: [Integer] -> String
 histogram = (++"==========\n0123456789\n") . toRows . digitFreqs
