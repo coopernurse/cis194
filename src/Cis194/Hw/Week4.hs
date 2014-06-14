@@ -1,5 +1,7 @@
 module Cis194.Hw.Week4 where
 
+import Debug.Trace
+
 -- EXERCISE 1
 fun1 :: [Integer] -> Integer
 fun1 [] = 1
@@ -24,16 +26,37 @@ fun2 n
 -- when we have a value of 1 or less. then, sum all the
 -- values in that list that are even
 fun2' :: Integer -> Integer
-fun2' n = sum . filter (even) . takeWhile (>1) $ iterate (\x -> if even x then x `div` 2 else 3 * x + 1) n
+fun2' n = sum . filter (even) . takeWhile (>1) $ iterate iterator n
+  where iterator x
+         | even x = x `div` 2
+         | otherwise = 3 * x + 1
 
 -- EXERCISE 2
 data Tree a = Leaf
   | Node Integer (Tree a) a (Tree a)
   deriving (Show, Eq)
 
-foldTree :: [a] -> Tree a
-foldTree [] = Leaf
-foldTree list = Leaf
+-- (a -> b -> b) -> b -> [a] -> b
+foldTree :: [Char] -> Tree Char
+foldTree xs = foldr (flarp) Leaf xs
+
+flarp :: Char -> Tree Char -> Tree Char
+flarp item tree = case tree of
+  (Leaf) -> Node 0 Leaf item Leaf
+  (Node h1 (Leaf) value (Leaf))            -> Node (h1+1) (Node h1 Leaf item Leaf) value Leaf
+  (Node h1 n1@(Node _ _ _ _) value (Leaf)) -> Node h1 n1 value (Node (h1-1) Leaf item Leaf)
+  (Node h1 (Leaf) value n1@(Node _ _ _ _)) -> Node h1 (Node (h1-1) Leaf item Leaf) value n1
+  (Node h1 n1 value n2)                    -> case compare (balanced n1) (balanced n2) of
+                                                (EQ) -> Node (h1+1) n1 value (flarp item n2)
+                                                (LT) -> Node h1 (flarp item n1) value n2
+                                                (GT) -> Node h1 n1 value (flarp item n2)
+
+balanced :: Tree Char -> Integer
+balanced t = (balanced' t)
+  where balanced' Leaf = 0
+        balanced' n@(Node _ Leaf _ n2@(Node _ _ _ _)) = 1 + balanced' n2
+        balanced' n@(Node _ n2@(Node _ _ _ _) _ Leaf) = 1 + balanced' n2
+        balanced' n@(Node _ l _ r)                    = 1 + balanced' l + balanced' r
 
 -- EXERCISE 3
 
@@ -41,11 +64,14 @@ foldTree list = Leaf
 -- True
 xor :: [Bool] -> Bool
 xor [] = False
-xor list = (==1) . (`mod`2) $ foldr (\item acc -> if item then (acc :: Integer) + 1 else (acc :: Integer)) 0 list
+xor list = (==1) . (`mod`2) $ foldr (fx) 0 list
+  where fx item acc
+         | item = (acc :: Integer) + 1
+         | otherwise = (acc :: Integer)
 
 -- implement map using fold
 map' :: (a -> b) -> [a] -> [b]
-map' f list = foldr (\x l -> f x : l) [] list
+map' f list = foldr (\item acc -> f item : acc) [] list
 
 -- EXERCISE 4
 
@@ -62,5 +88,7 @@ map' f list = foldr (\x l -> f x : l) [] list
 sieveSundaram :: Integer -> [Integer]
 sieveSundaram n
   | n < 2 = []
-  | otherwise = 2:[2*z+1 | z <- [1..n], (z `elem` rejects) == False]
+  | otherwise = 2:[2*z+1 | z <- [1..n], (z `notElem` rejects)]
   where rejects = [i+j+2*i*j | i <- [1..n], j <- [i..n], i <= j, i+j+2*i*j <= n]
+
+
