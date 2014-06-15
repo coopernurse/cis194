@@ -39,8 +39,14 @@ losses (aroll,droll) (Battlefield a d)
   | aroll > droll = Battlefield a (d-1)
   | otherwise     = Battlefield (a-1) d
 
+-- Let both sides roll for the armies in play, and return a new battlefield calculated from the losses.
 battle :: Battlefield -> Rand StdGen Battlefield
 battle start = 
   roll (min 3 (attackers start - 1)) >>= \attackRoll ->
   roll (min 2 (defenders start))     >>= \defenseRoll ->
   return $ foldr losses start (zip attackRoll defenseRoll)
+
+invade :: Battlefield -> Rand StdGen Battlefield
+invade field@(Battlefield a d) 
+  | d == 0 || a < 2 = return field
+  | otherwise       = (battle field) >>= invade
