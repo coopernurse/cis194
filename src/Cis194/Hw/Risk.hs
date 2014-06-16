@@ -50,3 +50,10 @@ invade :: Battlefield -> Rand StdGen Battlefield
 invade field@(Battlefield a d) 
   | d == 0 || a < 2 = return field
   | otherwise       = (battle field) >>= invade
+
+attacksuccess :: Battlefield -> Int
+attacksuccess (Battlefield a d) = if (a > 1) then 1 else 0
+
+successProb :: Battlefield -> Rand StdGen Double
+successProb field = ((/1000.0) . fromIntegral . sum . (map attacksuccess)) <$> (sequence . (replicateM 1000 invade) $ field)
+
