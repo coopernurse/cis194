@@ -38,25 +38,31 @@ data Tree a = Leaf
 
 -- (a -> b -> b) -> b -> [a] -> b
 foldTree :: [Char] -> Tree Char
-foldTree xs = foldr (flarp) Leaf xs
+foldTree xs = foldr (insert) Leaf xs
 
-flarp :: Char -> Tree Char -> Tree Char
-flarp item tree = case tree of
-  (Leaf) -> Node 0 Leaf item Leaf
-  (Node h1 (Leaf) value (Leaf))            -> Node (h1+1) (Node h1 Leaf item Leaf) value Leaf
-  (Node h1 n1@(Node _ _ _ _) value (Leaf)) -> Node h1 n1 value (Node (h1-1) Leaf item Leaf)
-  (Node h1 (Leaf) value n1@(Node _ _ _ _)) -> Node h1 (Node (h1-1) Leaf item Leaf) value n1
-  (Node h1 n1 value n2)                    -> case compare (balanced n1) (balanced n2) of
-                                                (EQ) -> Node (h1+1) n1 value (flarp item n2)
-                                                (LT) -> Node h1 (flarp item n1) value n2
-                                                (GT) -> Node h1 n1 value (flarp item n2)
+insert :: Char -> Tree Char -> Tree Char
+insert item Leaf = Node 0 Leaf item Leaf
+insert item (Node h l v r) = case (l, r) of
+  (Leaf, Leaf)           -> Node (h+1) (Node h Leaf item Leaf) v r
+  ((Node _ _ _ _), Leaf) -> Node h l v (Node (h-1) Leaf item Leaf)
+  (Leaf, (Node _ _ _ _)) -> Node h (Node (h-1) Leaf item Leaf) v r
+  (_)                    -> case compare (height l) (height r) of
+    (GT) -> Node h l v (insert item r)
+    (LT) -> Node h (insert item l) v r
+    (EQ) -> case ((balanced l), (balanced r)) of
+      (True, True)  -> Node (h+1) (insert item l) v r
+      (True, False) -> Node h l v (insert item r)
+      (_)           -> Node h (insert item l) v r
 
-balanced :: Tree Char -> Integer
-balanced t = (balanced' t)
-  where balanced' Leaf = 0
-        balanced' n@(Node _ Leaf _ n2@(Node _ _ _ _)) = 1 + balanced' n2
-        balanced' n@(Node _ n2@(Node _ _ _ _) _ Leaf) = 1 + balanced' n2
-        balanced' n@(Node _ l _ r)                    = 1 + balanced' l + balanced' r
+height :: Tree Char -> Integer
+height Leaf = -1
+height (Node h _ _ _) = h
+
+balanced :: Tree Char -> Bool
+balanced Leaf = True
+balanced (Node _ Leaf _ Leaf) = True
+balanced (Node _ n1@(Node _ _ _ _) _ n2@(Node _ _ _ _)) = balanced n1 && balanced n2
+balanced _ = False
 
 -- EXERCISE 3
 
