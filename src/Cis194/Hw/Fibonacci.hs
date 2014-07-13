@@ -8,7 +8,9 @@ module Cis194.Hw.Fibonacci where
 -- recursive function definition of type:
 --
 fib :: Integer -> Integer
-fib _ = 0
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n-1) + fib (n-2)
 --
 -- so that fib n computes the nth Fibonacci number Fn. Then, use fib to
 -- define the infinite list of all Fibonacci numbers:
@@ -16,7 +18,7 @@ fib _ = 0
 -- fibs1 :: [Integer]
 
 fibs1 :: [Integer]
-fibs1 = []
+fibs1 = map fib [0..]
 
 ----------
 -- Ex 2 --
@@ -26,25 +28,34 @@ fibs1 = []
 --
 -- fibs2 :: [Integer]
 --
--- so that it has the same elements as fibs, but computing the first n
--- elements of fibs2 requires only O(n) addition operations. Be sure to
+-- so that it has the same elements as fibs1, but computing the first n
+-- elements of fibs2 requires only O(n) additional operations. Be sure to
 -- use standard recursion pattern(s) from Prelude, as appropriate.
 --
 
+fibs2 :: [Integer]
+fibs2 = map head $ iterate (\(a:b:c:ds) -> [b, c, (b+c)]) [0, 1, 1]
 
 ----------
 -- Ex 3 --
 ----------
 
 -- * Define a data type of polymorphic streams, Stream.
+
+data Stream a = Cons a (Stream a)
+
 -- * Write a function to convert a Stream to an infinite list:
 --
 --   streamToList :: Stream a -> [a]
+
+streamToList :: Stream a -> [a]
+streamToList (Cons x c) = x : streamToList c
+
 --
 -- * Make your own instance of Show for Stream:
 --
---   instance Show a => Show (Stream a) where
---     show ...
+instance Show a => Show (Stream a) where
+  show s = show $ take 20 $ streamToList s
 --
 --   ...which works by showing only some prefix of a stream (say, the first
 --   20 elements)
@@ -55,25 +66,25 @@ fibs1 = []
 
 -- * Write a function:
 --
--- streamRepeat :: a -> Stream a
---
 -- ...which generates a stream containing infinitely many copies of the
 -- given element
---
+streamRepeat :: a -> Stream a
+streamRepeat x = Cons x $ streamRepeat x
+
 -- * Write a function:
---
--- streamMap :: (a -> b) -> Stream a -> Stream b
 --
 -- ...which applies a function to every element of a Stream
---
+streamMap :: (a -> b) -> Stream a -> Stream b
+streamMap f (Cons x s) = Cons (f x) $ streamMap f s
+
 -- * Write a function:
---
--- streamFromSeed :: (a -> a) -> a -> Stream a
 --
 -- ...which generates a Stream from a “seed” of type a, which is the first
 -- element of the stream, and an “unfolding rule” of type a -> a which
 -- specifies how to transform the seed into a new seed, to be used for
 -- generating the rest of the stream.
+streamFromSeed :: (a -> a) -> a -> Stream a
+streamFromSeed f x = Cons x $ streamFromSeed f (f x)
 
 ----------
 -- Ex 5 --
@@ -81,7 +92,8 @@ fibs1 = []
 
 -- * Define the stream:
 --
--- nats :: Stream Integer
+nats :: Stream Integer
+nats = streamFromSeed (+1) (0 :: Integer)
 --
 -- ...which contains the infinite list of natural numbers 0, 1, 2...
 --
@@ -99,3 +111,16 @@ fibs1 = []
 -- Hint: define a function interleaveStreams which alternates the
 -- elements from two streams. Can you use this function to implement ruler
 -- in a clever way that does not have to do any divisibility testing?
+
+interleaveStreams :: Stream a -> Stream a -> Stream a
+interleaveStreams (Cons x1 s1) (Cons x2 s2) = Cons x1 $ Cons x2 $ interleaveStreams s1 s2
+
+ruler :: Stream Integer
+ruler = interleaveStreams (streamRepeat 0) (streamMap highestPowOfTwoThatDivsEvenly $ streamFromSeed (+2) 2)
+
+highestPowOfTwoThatDivsEvenly :: Integer -> Integer
+highestPowOfTwoThatDivsEvenly n = go 1
+  where
+    go acc = if isInt (quotient (acc + 1)) then go (acc + 1) else acc
+    isInt x = x == fromInteger (round x)
+    quotient pow = (fromIntegral n) / 2**(fromIntegral pow)
