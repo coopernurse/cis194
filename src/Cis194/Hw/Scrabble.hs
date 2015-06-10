@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, FlexibleInstances #-}
-module Scrabble where
+module Cis194.Hw.Scrabble where
 
 import Data.Monoid
 

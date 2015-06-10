@@ -15,6 +15,7 @@ data JoinList m a = Empty
    deriving (Eq, Show)
 
 -- ** Exercise 1
+
 -- Write an append function for JoinLists
 -- that yields a new JoinList whose monoidal annotation is derived from
 -- those of the two arguments.
@@ -24,84 +25,62 @@ data JoinList m a = Empty
 (+++) (Empty) jl2 = jl2
 (+++) jl1 jl2 = Append (tag jl1 `mappend` tag jl2) jl1 jl2
 
---  You may find it helpful to implement a helper function
---  which gets the annotation at the root of a JoinList.
+--  snag the annotation of a JoinList
 tag :: Monoid m => JoinList m a -> m
 tag (Single m a) = m
-tag (Empty) = mempty
-tag (Append m jl1 jl2) = tag jl1 `mappend` tag jl2
+tag Empty = mempty
+tag (Append m jl1 jl2) = m
 
 -- ** Exercise 2
---
--- Helper functions:
---
 
+-- safe access into a list by index
 (!!?) :: [a] -> Int -> Maybe a
 []     !!? _         = Nothing
 _      !!? i | i < 0 = Nothing
 (x:xs) !!? 0 = Just x
 (x:xs) !!? i = xs !!? (i-1)
 
-jlToList :: JoinList m a -> [a]
-jlToList Empty            = []
+-- transmute a JoinList to a list, dumping the monoidal cache
+jlToList :: Monoid m => JoinList m a -> [a]
+jlToList Empty            = mempty
 jlToList (Single _ a)     = [a]
-jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
-
--- ** Exercise 2
---
--- Helper functions:
---
-
-(!!?) :: [a] -> Int -> Maybe a
-[]     !!? _         = Nothing
-_      !!? i | i < 0 = Nothing
-(x:xs) !!? 0 = Just x
-(x:xs) !!? i = xs !!? (i-1)
-
-jlToList :: JoinList m a -> [a]
-jlToList Empty            = []
-jlToList (Single _ a)     = [a]
-jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
+jlToList (Append _ l1 l2) = jlToList l1 <> jlToList l2
 
 -- 1. Implement the function:
 --    indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
 --    ...which finds the JoinList element at the specified index
 
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
-indexJ _ (Empty)              = Nothing
-indexJ 0 (Single m a)         = Just a
-indexJ n (Single m a) | n > 0 = Nothing
-indexJ n _            | n < 0 = Nothing
 indexJ n (Append m jl1 jl2)
   | n < leftSize = indexJ n jl1
   | otherwise = indexJ (n - leftSize) jl2
   where leftSize = getSize . size $ (tag jl1)
+indexJ 0 (Single m a) = Just a
+indexJ _ _            = Nothing
 
 -- 2. Implement the function:
 -- dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 -- ...which drops the first n elements from a JoinList.
 
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-dropJ _ (Empty)    = Empty
-dropJ n jl | n < 1 = jl
-dropJ n (Single m a) = Empty
 dropJ n (Append m jl1 jl2)
   | n < leftSize = dropJ n jl1 +++ jl2
   | otherwise = dropJ (n - leftSize) jl2
   where leftSize = getSize . size $ tag jl1
+dropJ n jl | n < 1 = jl
+dropJ _ _          = Empty
 
 -- 3. Implement the function:
 -- takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 -- ...which returns the first n elements from a JoinList.
 
 takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-takeJ _ (Empty)      = Empty
-takeJ n jl | n < 1   = Empty
-takeJ n (Single m a) = Single m a
 takeJ n (Append m jl1 jl2)
-  | n > leftSize = Append m jl1 (takeJ (n - leftSize) jl2)
+  | n > leftSize = jl1 +++ (takeJ (n - leftSize) jl2)
   | otherwise = takeJ n jl1
   where leftSize = getSize . size $ tag jl1
+takeJ n derp@(Single m a) | n > 0 = derp
+takeJ _ _            = Empty
 
 
 -- ** Exercise 3
@@ -127,14 +106,12 @@ balanceJ jl@(Append _ _ _) = (balanceJ $ takeJ split jl) +++ (balanceJ $ dropJ s
   where split = (`div` 2) . getSize . size $ tag jl
 balanceJ jl = jl
 
--- NOTE: I think we the value function can be improved... but how? new
--- Scored type class?
 instance Buffer (JoinList (Score, Size) String) where
   fromString s               = balanceJ $ foldr (+++) Empty $ map (\y -> Single (scoreString y, Size 1) y) $ lines s
   line n jl                  = indexJ n jl
-  numLines jl                = getSize . size $ tag jl
+  numLines                   = getSize . size . tag
   replaceLine n s jl         = takeJ (n-1) jl +++ fromString s +++ dropJ n jl
-  toString jl                = unwords $ jlToList jl
+  toString                   = unwords . jlToList
   value (Empty)              = 0
   value (Single (sc, _) _)   = getScore sc
   value (Append (sc, _) _ _) = getScore sc
