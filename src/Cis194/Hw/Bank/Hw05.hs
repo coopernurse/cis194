@@ -8,7 +8,7 @@ import Data.Map.Strict (Map)
 import Data.Bits (xor)
 import Data.List (sortBy)
 import Data.Word (Word8)
-{-import System.Environment (getArgs)-}
+import System.Environment (getArgs)
 
 import qualified Data.ByteString.Lazy as BS
 import qualified Data.Map.Strict as Map
@@ -71,10 +71,39 @@ getCriminal = fst . Map.foldlWithKey (go) ("Nobody", 0)
 -- Exercise 7 -----------------------------------------
 
 undoTs :: Map String Integer -> [TId] -> [Transaction]
-undoTs m ids = undefined
+undoTs m ids = if possible then personAmtsToTrans ps else []
+  where possible = 0 == foldl (\acc (_, amt) -> acc + amt) 0 ps
+        ps = Map.toList m
+
+-- payers: those who ended up with positive balance
+-- payees: those who ended up with negative balance
+
+personAmtsToTrans :: [(String, Integer)] -> [Transaction]
+personAmtsToTrans [] = []
+personAmtsToTrans ps = ts ++ personAmtsToTrans ps'
+  where (ps', ts) = go ps
+
+-- ran out of naming ideas
+
+go :: [(String, Integer)] -> ([(String, Integer)], [Transaction])
+go ps = foldl (transact) ([], []) $ zip2WithPad ("ignore", 0) payees payers
+  where payees = sortPeople False $ filter ((>0) . snd) ps
+        payers = sortPeople True $ filter ((<=0) . snd) ps
+        transact (ps', ts) (("ignore", 0), n) = (n:ps', ts)
+        transact (ps', ts) (p, ("ignore", 0)) = (p:ps', ts)
+        transact (ps', ts) ((pos, posAmt), (neg, negAmt)) = case compare posAmt (abs negAmt) of
+                                                             GT -> ((pos, posAmt-negAmt):ps', (Transaction pos neg (abs negAmt) "x"):ts) -- pos has more than neg
+                                                             LT -> ((neg, negAmt+posAmt):ps', (Transaction pos neg (posAmt) "x"):ts)     -- neg was more than pos had to give
+                                                             EQ -> (ps', (Transaction pos neg (posAmt) "x"):ts)     -- cancel each other out!
 
 sortPeople :: Bool -> [(String, Integer)] -> [(String, Integer)]
 sortPeople asc ps = sortBy (\x y -> (if asc then compare else flip compare) (snd x) (snd y)) ps
+
+zip2WithPad :: (a, b) -> [(a, b)] -> [(a, b)] -> [((a, b), (a, b))]
+zip2WithPad pad [] (x:xs) = (pad, x):(zip2WithPad pad [] xs)
+zip2WithPad pad (x:xs) [] = (x, pad):(zip2WithPad pad xs [])
+zip2WithPad pad (x:xs) (y:ys) = (x, y):(zip2WithPad pad xs ys)
+zip2WithPad _ _ _ = []
 
 -- Exercise 8 -----------------------------------------
 
@@ -102,25 +131,15 @@ doEverything dog1 dog2 trans vict fids out = do
 
 main :: IO ()
 main = do
-  key <- getSecret "dog-original.jpg" "dog.jpg"
-  decryptWithKey key "victims.json"
-  ts <- getBadTs "victims.json" "transactions.json"
-  case ts of
-    Just xs -> print $ length xs
-    Nothing -> print (0 :: Int)
-
-{-main :: IO ()-}
-{-main = do-}
-  {-args <- getArgs-}
-  {-crim <--}
-    {-case args of-}
-      {-dog1:dog2:trans:vict:ids:out:_ ->-}
-          {-doEverything dog1 dog2 trans vict ids out-}
-      {-_ -> doEverything "dog-original.jpg"-}
-                        {-"dog.jpg"-}
-                        {-"transactions.json"-}
-                        {-"victims.json"-}
-                        {-"new-ids.json"-}
-                        {-"new-transactions.json"-}
-  {-putStrLn crim-}
-
+  args <- getArgs
+  crim <-
+    case args of
+      dog1:dog2:trans:vict:ids:out:_ ->
+          doEverything dog1 dog2 trans vict ids out
+      _ -> doEverything "dog-original.jpg"
+                        "dog.jpg"
+                        "transactions.json"
+                        "victims.json"
+                        "new-ids.json"
+                        "new-transactions.json"
+  putStrLn crim
