@@ -71,9 +71,7 @@ getCriminal = fst . Map.foldlWithKey (go) ("Nobody", 0)
 -- Exercise 7 -----------------------------------------
 
 undoTs :: Map String Integer -> [TId] -> [Transaction]
-undoTs m ids = if possible then personAmtsToTrans ps else []
-  where possible = 0 == foldl (\acc (_, amt) -> acc + amt) 0 ps
-        ps = Map.toList m
+undoTs m ids = personAmtsToTrans $ Map.toList m
 
 -- payers: those who ended up with positive balance
 -- payees: those who ended up with negative balance
@@ -81,14 +79,14 @@ undoTs m ids = if possible then personAmtsToTrans ps else []
 personAmtsToTrans :: [(String, Integer)] -> [Transaction]
 personAmtsToTrans [] = []
 personAmtsToTrans ps = ts ++ personAmtsToTrans ps'
-  where (ps', ts) = go ps
+  where (ps', ts) = personAmtsToTransWithRem ps
 
 -- ran out of naming ideas
 
-go :: [(String, Integer)] -> ([(String, Integer)], [Transaction])
-go ps = foldl (transact) ([], []) $ zip2WithPad ("ignore", 0) payees payers
+personAmtsToTransWithRem :: [(String, Integer)] -> ([(String, Integer)], [Transaction])
+personAmtsToTransWithRem ps = foldl (transact) ([], []) $ zip2WithPad ("ignore", 0) payees payers
   where payees = sortPeople False $ filter ((>0) . snd) ps
-        payers = sortPeople True $ filter ((<=0) . snd) ps
+        payers = sortPeople True $ filter ((<0) . snd) ps
         transact (ps', ts) (("ignore", 0), n) = (n:ps', ts)
         transact (ps', ts) (p, ("ignore", 0)) = (p:ps', ts)
         transact (ps', ts) ((pos, posAmt), (neg, negAmt)) = case compare posAmt (abs negAmt) of
