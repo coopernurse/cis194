@@ -6,6 +6,7 @@ import Control.Applicative ((<*>), (<$>))
 import Data.ByteString.Lazy (ByteString)
 import Data.Map.Strict (Map)
 import Data.Bits (xor)
+import Data.List (sortBy)
 import Data.Word (Word8)
 {-import System.Environment (getArgs)-}
 
@@ -65,17 +66,20 @@ upsert updater k a m = case Map.lookup k m of
 
 getCriminal :: Map String Integer -> String
 getCriminal = fst . Map.foldlWithKey (go) ("Nobody", 0)
-  where go p@(worstPerson, biggestAmt) person amt = if (amt > biggestAmt) then (person, amt) else p
+  where go p@(_, biggestAmt) person amt = if (amt > biggestAmt) then (person, amt) else p
 
 -- Exercise 7 -----------------------------------------
 
 undoTs :: Map String Integer -> [TId] -> [Transaction]
-undoTs = undefined
+undoTs m ids = undefined
+
+sortPeople :: Bool -> [(String, Integer)] -> [(String, Integer)]
+sortPeople asc ps = sortBy (\x y -> (if asc then compare else flip compare) (snd x) (snd y)) ps
 
 -- Exercise 8 -----------------------------------------
 
 writeJSON :: ToJSON a => FilePath -> a -> IO ()
-writeJSON = undefined
+writeJSON fp x = BS.writeFile fp (encode x)
 
 -- Exercise 9 -----------------------------------------
 
