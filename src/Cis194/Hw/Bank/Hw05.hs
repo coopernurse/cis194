@@ -6,13 +6,12 @@ import Control.Applicative ((<*>), (<$>))
 import Data.ByteString.Lazy (ByteString)
 import Data.Map.Strict (Map)
 import Data.Bits (xor)
-import Data.List (sortBy)
 import Data.Word (Word8)
 import System.Environment (getArgs)
 
+import qualified Data.List as L
 import qualified Data.ByteString.Lazy as BS
 import qualified Data.Map.Strict as Map
-
 
 import Parser
 
@@ -77,41 +76,43 @@ getCriminal = fst . Map.foldlWithKey (go) ("Nobody", 0)
 
 -- Exercise 7 -----------------------------------------
 
-undoTs :: Map String Integer -> [TId] -> [Transaction]
-undoTs m ids = personAmtsToTrans $ Map.toList m
+setId :: TId -> Transaction -> Transaction
+setId tid t = Transaction (from t) (to t) (amount t) tid
 
--- payers: those who ended up with positive balance
--- payees: those who ended up with negative balance
+undoTs :: Map String Integer -> [TId] -> [Transaction]
+undoTs m ids = zipWith (setId) ids (personAmtsToTrans $ Map.toList m)
 
 personAmtsToTrans :: [(String, Integer)] -> [Transaction]
 personAmtsToTrans [] = []
 personAmtsToTrans ps = ts ++ personAmtsToTrans remainder
   where (remainder, ts) = personAmtsToTransWithRem ps
 
+sortPeopleByAmt :: Bool -> [(String, Integer)] -> [(String, Integer)]
+sortPeopleByAmt asc ps = L.sortBy (\x y -> (if asc then compare else flip compare) (snd x) (snd y)) ps
 
-sortPeople :: Bool -> [(String, Integer)] -> [(String, Integer)]
-sortPeople asc ps = sortBy (\x y -> (if asc then compare else flip compare) (snd x) (snd y)) ps
-
-payees :: [(String, Integer)] -> [(String, Integer)]
-payees = sortPeople False . filter ((>0) . snd)
+-- payers: those who ended up with positive balance
+-- payees: those who ended up with negative balance
 
 payers :: [(String, Integer)] -> [(String, Integer)]
-payers = sortPeople True . filter ((<0) . snd)
+payers = sortPeopleByAmt True . filter ((>0) . snd)
+
+payees :: [(String, Integer)] -> [(String, Integer)]
+payees = sortPeopleByAmt False . filter ((<0) . snd)
 
 zip2WithPad :: (a, b) -> [(a, b)] -> [(a, b)] -> [((a, b), (a, b))]
-zip2WithPad pad [] (x:xs) = (pad, x):(zip2WithPad pad [] xs)
-zip2WithPad pad (x:xs) [] = (x, pad):(zip2WithPad pad xs [])
-zip2WithPad pad (x:xs) (y:ys) = (x, y):(zip2WithPad pad xs ys)
-zip2WithPad _ _ _ = []
+zip2WithPad pad (x:xs) (y:ys) = (x, y)  :(zip2WithPad pad xs ys)
+zip2WithPad pad []     (x:xs) = (pad, x):(zip2WithPad pad [] xs)
+zip2WithPad pad (x:xs) []     = (x, pad):(zip2WithPad pad xs [])
+zip2WithPad _ _ _             = []
 
 personAmtsToTransWithRem :: [(String, Integer)] -> ([(String, Integer)], [Transaction])
 personAmtsToTransWithRem ps = foldl (transact) ([], []) $ zip2WithPad ("ignore", 0) (payees ps) (payers ps)
-  where transact (ps', ts) (("ignore", 0), n) = (n:ps', ts)
-        transact (ps', ts) (p, ("ignore", 0)) = (p:ps', ts)
-        transact (ps', ts) ((pos, posAmt), (neg, negAmt)) = case compare posAmt (abs negAmt) of
-                                                             GT -> ((pos, posAmt-negAmt):ps', (Transaction pos neg (abs negAmt) "x"):ts) -- pos has more than neg
-                                                             LT -> ((neg, negAmt+posAmt):ps', (Transaction pos neg (posAmt) "x"):ts)     -- neg was more than pos had to give
-                                                             EQ -> (ps', (Transaction pos neg (posAmt) "x"):ts)                          -- cancel each other out!
+  where transact (ps', ts) (("ignore", 0), n)             = (n:ps', ts)
+        transact (ps', ts) (p, ("ignore", 0))             = (p:ps', ts)
+        transact (ps', ts) ((pye, pyeAmt), (pyr, pyrAmt)) = case compare (abs pyeAmt) pyrAmt of
+                                                             GT -> ((pye, pyrAmt+pyeAmt):ps', (Transaction pyr pye pyeAmt "replace"):ts) -- was owed more than had to give
+                                                             LT -> ((pyr, pyrAmt+pyeAmt):ps', (Transaction pyr pye pyrAmt "replace"):ts) -- had to give more than was owed
+                                                             EQ -> (ps',                      (Transaction pyr pye pyeAmt "replace"):ts) -- cancel each other out!
 
 -- Exercise 8 -----------------------------------------
 
@@ -126,19 +127,15 @@ doEverything dog1 dog2 trans vict fids out = do
   key <- getSecret dog1 dog2
   decryptWithKey key vict
   mts <- getBadTs vict trans
-  print "------ derp1"
   case mts of
     Nothing -> error "No Transactions"
     Just ts -> do
       mids <- parseFile fids
-      print "------ derp2"
       case mids of
         Nothing  -> error "No ids"
         Just ids -> do
           let flow = getFlow ts
-          print "------ derp3"
           writeJSON out (undoTs flow ids)
-          print "------ derp4"
           return (getCriminal flow)
 
 main :: IO ()
