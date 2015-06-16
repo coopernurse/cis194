@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
-module HW05 where
+module Hw05 where
 
 import Control.Applicative ((<*>), (<$>))
 import Data.ByteString.Lazy (ByteString)
