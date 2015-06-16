@@ -100,14 +100,13 @@ zip2Tup2WithPad pad (x:xs) []     = (x, pad):(zip2Tup2WithPad pad xs [])
 zip2Tup2WithPad _ _ _             = []
 
 personAmtsToTransWithRem :: [(String, Integer)] -> ([(String, Integer)], [Transaction])
-personAmtsToTransWithRem (_:[]) = ([], [])
 personAmtsToTransWithRem ps = foldl (transact) ([], []) $ zip2Tup2WithPad ("ignore", 0) (payees ps) (payers ps)
   where transact (ps', ts) (("ignore", 0), n)             = (n:ps', ts)
         transact (ps', ts) (p, ("ignore", 0))             = (p:ps', ts)
         transact (ps', ts) ((pye, pyeAmt), (pyr, pyrAmt)) = case compare (abs pyeAmt) pyrAmt of
-                                                             GT -> ((pye, pyrAmt+pyeAmt):ps', (Transaction pyr pye pyrAmt "replace"):ts) -- was owed more than had to give
-                                                             LT -> ((pyr, pyrAmt+pyeAmt):ps', (Transaction pyr pye pyrAmt "replace"):ts) -- had to give more than was owed
-                                                             EQ -> (ps',                      (Transaction pyr pye pyeAmt "replace"):ts) -- cancel each other out!
+                                                             GT -> ((pye, pyrAmt+pyeAmt):ps', (Transaction pyr pye pyrAmt "replace"):ts)       -- was owed more than had to give
+                                                             LT -> ((pyr, pyrAmt+pyeAmt):ps', (Transaction pyr pye (abs pyeAmt) "replace"):ts) -- had to give more than was owed
+                                                             EQ -> (ps',                      (Transaction pyr pye pyrAmt "replace"):ts)       -- cancel each other out!
 
 -- Exercise 8 -----------------------------------------
 

@@ -2,7 +2,7 @@ module Hw05Spec (main, spec) where
 
 import Test.Hspec
 import Test.QuickCheck
-import Hw05 (getFlow, upsert, getCriminal, zip2Tup2WithPad, payers, payees)
+import Hw05 (getFlow, upsert, getCriminal, zip2Tup2WithPad, payers, payees, personAmtsToTransWithRem)
 import Data.Map.Strict as M
 
 import Parser
@@ -67,3 +67,14 @@ spec = do
 
     it "returns people who have received more than they paid, sorted descending" $ do
       payees ps `shouldBe` [("qux",-4),("wok",-3),("bar",-1)]
+
+  describe "personAmtsToTransWithRem" $ do
+    let ps1 = [("foo", 1), ("bar", -1)]
+    let ps2 = [("foo", 1), ("bar", -1), ("baz", 10)]
+    let ps3 = [("foo", 1), ("bar", -1), ("baz", -20)]
+    --let ps2 = [("foo", 1), ("bar", -1), ("baz", 10), ("qux", -4), ("blix", 3), ("wok", -3)]
+
+    it "creates new transactions representing transfers from payers to payees, returning remaining balances" $ do
+      personAmtsToTransWithRem ps1 `shouldBe` ([],[Transaction {from = "foo", to = "bar", amount = 1, tid = "replace"}])
+      personAmtsToTransWithRem ps2 `shouldBe` ([("foo", 1), ("baz", 9)],[Transaction {from = "baz", to = "bar", amount = 1, tid = "replace"}])
+      personAmtsToTransWithRem ps3 `shouldBe` ([("bar",-1),("baz",-19)],[Transaction {from = "foo", to = "baz", amount = 1, tid = "replace"}])
