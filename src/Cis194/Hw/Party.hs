@@ -4,7 +4,6 @@ import Cis194.Hw.Employee
 import Data.Monoid
 import Data.Tree
 import Debug.Trace
-import Employee
 
 -- ** Exercise 1
 --

@@ -4,8 +4,8 @@ Author:                 James Cooper <james@bitmechanic.com>
 Maintainer:             James Cooper <james@bitmechanic.com>
 License:                BSD3
 License-File:           LICENSE
--- Synopsis:               
--- Description:            
+-- Synopsis:
+-- Description:
 Cabal-Version:          >= 1.10
 Build-Type:             Simple
 
@@ -13,23 +13,35 @@ Library
   Default-Language:     Haskell2010
   HS-Source-Dirs:       src
   GHC-Options:          -Wall
-  Exposed-Modules:      Cis194.Hw.Week1
-  Other-Modules:        
+  Exposed-Modules:      Cis194.Hw.AParser
+                      , Cis194.Hw.Calc
+                      , Cis194.Hw.Employee
+                      , Cis194.Hw.ExprT
+                      , Cis194.Hw.Fibonacci
+                      , Cis194.Hw.Golf
+                      , Cis194.Hw.Log
+                      , Cis194.Hw.LogAnalysis
+                      , Cis194.Hw.Parser
+                      , Cis194.Hw.Party
+                      , Cis194.Hw.SExpr
+                      , Cis194.Hw.StackVM
+                      , Cis194.Hw.Week1
+                      , Cis194.Hw.Week4
+  Other-Modules:
   Build-Depends:        base >= 4 && < 5
                       , containers
 
 Test-Suite spec
   Type:                 exitcode-stdio-1.0
   Default-Language:     Haskell2010
-  Hs-Source-Dirs:       src
-                      , test
-  Ghc-Options:          -Wall
+  Hs-Source-Dirs:       test
   Main-Is:              Spec.hs
   Build-Depends:        base
+                      , cis194
                       , hspec
                       , containers
                       , QuickCheck
 
 Source-Repository head
   Type:                 git
---  Location:             
+--  Location:
